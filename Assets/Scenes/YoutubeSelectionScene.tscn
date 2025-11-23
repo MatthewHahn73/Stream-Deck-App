@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3 uid="uid://1stnqodxk3fa"]
+
+[ext_resource type="Shader" uid="uid://d3ccmggvy2v2h" path="res://Assets/Custom Themes/Shaders/blur.gdshader" id="1_7ar52"]
+[ext_resource type="Texture2D" uid="uid://dyai6p0xn0gyq" path="res://Assets/Textures/Backgrounds/White Background.png" id="2_j3qb6"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_b3144"]
+shader = ExtResource("1_7ar52")
+shader_parameter/amount = 1.0000000475
+
+[node name="YoutubeSelectionScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BlurredBackgroundTexture" type="TextureRect" parent="."]
+modulate = Color(1, 1, 1, 0)
+material = SubResource("ShaderMaterial_b3144")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_j3qb6")

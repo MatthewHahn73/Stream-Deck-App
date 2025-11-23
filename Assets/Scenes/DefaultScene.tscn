@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3 uid="uid://dqj23206f0dsw"]
+[gd_scene load_steps=31 format=3 uid="uid://dqj23206f0dsw"]
 
 [ext_resource type="Texture2D" uid="uid://b24t74v8syjmc" path="res://Assets/Textures/Backgrounds/OptionsBackground.png" id="1_6kbbk"]
 [ext_resource type="Texture2D" uid="uid://d4f1gstadffqk" path="res://Assets/Textures/Icons/PowerIcon.png" id="1_wbwc7"]
@@ -13,6 +13,7 @@
 [ext_resource type="Texture2D" uid="uid://d1n3screhwtk" path="res://Assets/Textures/Icons/PowerIcon-Hover.png" id="9_lhorl"]
 [ext_resource type="PackedScene" uid="uid://bqpjobh068c6u" path="res://Assets/Scenes/SettingsScene.tscn" id="11_utu8n"]
 [ext_resource type="Theme" uid="uid://ow000d0w1g6a" path="res://Assets/Custom Themes/SettingsTheme.tres" id="13_xvm51"]
+[ext_resource type="PackedScene" uid="uid://dtffkgleva4vo" path="res://Assets/Scenes/ErrorScene.tscn" id="14_p1b5j"]
 [ext_resource type="Texture2D" uid="uid://bnberx0u0k7gg" path="res://Assets/Textures/Logo Backgrounds/AppleTV.png" id="15_mbpuf"]
 [ext_resource type="AudioStream" uid="uid://bv63xjbpfg0xp" path="res://Assets/Sounds/BlipSound.wav" id="16_8f2q7"]
 [ext_resource type="Texture2D" uid="uid://cmumda413s570" path="res://Assets/Textures/Logo Backgrounds/Disney.png" id="16_p1b5j"]
@@ -324,14 +325,6 @@ size_flags_vertical = 4
 theme = ExtResource("4_ww48f")
 text = "HBO Max"
 
-[node name="Hulu" type="Button" parent="OptionsBackground/OptionsBox/ServicesBox"]
-custom_minimum_size = Vector2(400, 50)
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-theme = ExtResource("4_ww48f")
-text = "Hulu"
-
 [node name="Netflix" type="Button" parent="OptionsBackground/OptionsBox/ServicesBox"]
 custom_minimum_size = Vector2(400, 50)
 layout_mode = 2
@@ -406,34 +399,14 @@ layout_mode = 2
 theme = ExtResource("13_xvm51")
 theme_override_font_sizes/font_size = 25
 
-[node name="ErrorMarginContainer" type="MarginContainer" parent="."]
+[node name="ErrorScene" parent="." instance=ExtResource("14_p1b5j")]
 visible = false
 layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_top = -40.0
-offset_right = 391.0
-grow_vertical = 0
-theme_override_constants/margin_left = 15
-theme_override_constants/margin_bottom = 5
-
-[node name="ErrorContainer" type="HBoxContainer" parent="ErrorMarginContainer"]
-layout_mode = 2
-theme_override_constants/separation = 0
-alignment = 2
-
-[node name="ErrorType" type="Label" parent="ErrorMarginContainer/ErrorContainer"]
-layout_mode = 2
-theme = ExtResource("13_xvm51")
-theme_override_colors/font_color = Color(1, 0, 0, 1)
-text = "Error Type: "
-
-[node name="ErrorMessage" type="Label" parent="ErrorMarginContainer/ErrorContainer"]
-layout_mode = 2
-theme = ExtResource("13_xvm51")
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-text = "Test Error Message"
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
 
 [node name="SettingsAnimations" type="AnimationPlayer" parent="."]
 libraries = {
@@ -464,9 +437,6 @@ resources = [PackedStringArray("AppleTV", "Disney", "HBOMax", "Hulu", "Netflix",
 [connection signal="mouse_entered" from="OptionsBackground/OptionsBox/ServicesBox/HBOMax" to="." method="_on_service_button_mouse_entered" binds= ["HBOMax"]]
 [connection signal="mouse_exited" from="OptionsBackground/OptionsBox/ServicesBox/HBOMax" to="." method="_on_any_mouse_exited" binds= ["HBOMax"]]
 [connection signal="pressed" from="OptionsBackground/OptionsBox/ServicesBox/HBOMax" to="." method="_on_any_service_button_pressed" binds= ["HBOMax"]]
-[connection signal="mouse_entered" from="OptionsBackground/OptionsBox/ServicesBox/Hulu" to="." method="_on_service_button_mouse_entered" binds= ["Hulu"]]
-[connection signal="mouse_exited" from="OptionsBackground/OptionsBox/ServicesBox/Hulu" to="." method="_on_any_mouse_exited" binds= ["Hulu"]]
-[connection signal="pressed" from="OptionsBackground/OptionsBox/ServicesBox/Hulu" to="." method="_on_any_service_button_pressed" binds= ["Hulu"]]
 [connection signal="mouse_entered" from="OptionsBackground/OptionsBox/ServicesBox/Netflix" to="." method="_on_service_button_mouse_entered" binds= ["Netflix"]]
 [connection signal="mouse_exited" from="OptionsBackground/OptionsBox/ServicesBox/Netflix" to="." method="_on_any_mouse_exited" binds= ["Netflix"]]
 [connection signal="pressed" from="OptionsBackground/OptionsBox/ServicesBox/Netflix" to="." method="_on_any_service_button_pressed" binds= ["Netflix"]]

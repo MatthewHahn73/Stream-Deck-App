@@ -12,7 +12,7 @@ config_version=5
 
 config/name="Steam Deck Streaming"
 run/main_scene="uid://dqj23206f0dsw"
-config/features=PackedStringArray("4.4", "Forward Plus")
+config/features=PackedStringArray("4.5", "Forward Plus")
 run/max_fps=60
 boot_splash/show_image=false
 boot_splash/fullsize=false

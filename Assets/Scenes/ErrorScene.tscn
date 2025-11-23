@@ -1,0 +1,197 @@
+[gd_scene load_steps=12 format=3 uid="uid://dtffkgleva4vo"]
+
+[ext_resource type="Theme" uid="uid://ow000d0w1g6a" path="res://Assets/Custom Themes/SettingsTheme.tres" id="1_4c4dx"]
+[ext_resource type="Texture2D" uid="uid://cyx54jgix6nof" path="res://Assets/Textures/Backgrounds/ErrorMessageBackground.png" id="1_jhql4"]
+[ext_resource type="Shader" uid="uid://d3ccmggvy2v2h" path="res://Assets/Custom Themes/Shaders/blur.gdshader" id="2_j2yka"]
+[ext_resource type="Script" uid="uid://d3oqb5425vy5k" path="res://Assets/Scripts/ErrorScript.gd" id="2_k8vt3"]
+[ext_resource type="Texture2D" uid="uid://dyai6p0xn0gyq" path="res://Assets/Textures/Backgrounds/White Background.png" id="2_oxsn0"]
+[ext_resource type="AudioStream" uid="uid://bv63xjbpfg0xp" path="res://Assets/Sounds/BlipSound.wav" id="4_kyx0k"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_swb5c"]
+shader = ExtResource("2_j2yka")
+shader_parameter/amount = 1.0000000475
+
+[sub_resource type="Animation" id="Animation_j2yka"]
+resource_name = "Fade In"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ErrorBoxTexture:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1e-05, 1e-05), Vector2(1.1, 1.1), Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BlurredBackgroundTexture:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_swb5c"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ErrorBoxTexture:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BlurredBackgroundTexture:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_ill61"]
+resource_name = "Fade Out"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ErrorBoxTexture:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.099999994, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1.1, 1.1), Vector2(1e-05, 1e-05)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BlurredBackgroundTexture:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_swb5c"]
+_data = {
+&"Fade In": SubResource("Animation_j2yka"),
+&"Fade Out": SubResource("Animation_ill61"),
+&"RESET": SubResource("Animation_swb5c")
+}
+
+[node name="ErrorScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_k8vt3")
+
+[node name="BlurredBackgroundTexture" type="TextureRect" parent="."]
+material = SubResource("ShaderMaterial_swb5c")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_oxsn0")
+
+[node name="ErrorBoxTexture" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -150.0
+offset_right = 300.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(300, 150)
+texture = ExtResource("1_jhql4")
+
+[node name="ErrorMessageMargins" type="MarginContainer" parent="ErrorBoxTexture"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 154.0
+grow_horizontal = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+
+[node name="ErrorMessageBox" type="VBoxContainer" parent="ErrorBoxTexture/ErrorMessageMargins"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ErrorMessageType" type="Label" parent="ErrorBoxTexture/ErrorMessageMargins/ErrorMessageBox"]
+layout_mode = 2
+theme = ExtResource("1_4c4dx")
+theme_override_colors/font_color = Color(0.9843137, 0.16862746, 0.16862746, 1)
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ErrorMessageText" type="Label" parent="ErrorBoxTexture/ErrorMessageMargins/ErrorMessageBox"]
+custom_minimum_size = Vector2(355, 170)
+layout_mode = 2
+theme = ExtResource("1_4c4dx")
+horizontal_alignment = 1
+autowrap_mode = 3
+text_overrun_behavior = 4
+
+[node name="Acknowledgement" type="MarginContainer" parent="ErrorBoxTexture"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -60.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/margin_bottom = 20
+
+[node name="BackButton" type="Button" parent="ErrorBoxTexture/Acknowledgement"]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+theme = ExtResource("1_4c4dx")
+text = "Ok"
+
+[node name="ErrorAnimations" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_swb5c")
+}
+
+[node name="MenuSounds" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_kyx0k")
+volume_db = -5.0
+
+[connection signal="mouse_entered" from="ErrorBoxTexture/Acknowledgement/BackButton" to="." method="_on_back_button_mouse_entered"]
+[connection signal="pressed" from="ErrorBoxTexture/Acknowledgement/BackButton" to="." method="_on_back_button_pressed"]
+[connection signal="animation_finished" from="ErrorAnimations" to="." method="_on_error_animations_animation_finished"]

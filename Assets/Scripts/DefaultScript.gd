@@ -2,12 +2,10 @@ extends Control
 
 #Node Variables
 @onready var SettingsMenu: VBoxContainer = $SettingsControl/SettingsMenu
+@onready var ErrorMenu: Control = $ErrorScene
 @onready var AppVersion: Label = $OptionsBackground/OptionsBox/TopMargin/TitleBox/AppVersion
 @onready var ClockLabel: Label = $ClockMarginContainer/ClockLabel
 @onready var ServicesBox: VBoxContainer = $OptionsBackground/OptionsBox/ServicesBox
-@onready var ErrorContainer: MarginContainer = $ErrorMarginContainer
-@onready var ErrorType: Label = $ErrorMarginContainer/ErrorContainer/ErrorType
-@onready var ErrorMessage: Label = $ErrorMarginContainer/ErrorContainer/ErrorMessage
 @onready var MenuSounds: AudioStreamPlayer = $MenuSounds
 @onready var SettingsAnimations: AnimationPlayer = $SettingsAnimations
 @onready var LogoAnimations: AnimationPlayer = $LogoAnimations
@@ -35,7 +33,7 @@ func CheckForUserSettings() -> int:
 		elif DirAccess.dir_exists_absolute(StreamingFolderPathDebugging):		#Project is a godot debugging build. Pull from the resources path
 			CopyDirectory(StreamingFolderPathDebugging, UserStreamingPath)
 		else:
-			UpdateErrorLabel("Error", "No Streaming folder exists at " + CurrentPath)
+			ShowErrorMessage("Error", "No Streaming folder exists at " + CurrentPath)
 			return 1 
 	return 0
 	
@@ -76,11 +74,11 @@ func LoadBashScriptSettings() -> int:
 					ConfFile.close()
 					return 0
 				else:
-					UpdateErrorLabel("Error", "Unable to load the conf file at " + ConfBlueprintLocation)
+					ShowErrorMessage("Error", "Unable to load the conf file at " + ConfBlueprintLocation)
 			else:
-				UpdateErrorLabel("Error", "Unable to find selected flatpak " + BrowserFlatpakLink)
+				ShowErrorMessage("Error", "Unable to find selected flatpak " + BrowserFlatpakLink)
 		else:
-			UpdateErrorLabel("Error", "Unable to find an installed flatpak browser")
+			ShowErrorMessage("Error", "Unable to find an installed flatpak browser")
 	BlueprintFile.close()
 	return 1
 	
@@ -92,9 +90,9 @@ func LoadVersion() -> void:
 			var VersionData = VersionJSON.data 
 			AppVersion.text = VersionData["Version"]
 		else:
-			UpdateErrorLabel("IOError", "Unable to load data from '" + VersionFileLocation + "'")
+			ShowErrorMessage("IOError", "Unable to load data from '" + VersionFileLocation + "'")
 	else:
-		UpdateErrorLabel("IOError", "Unable to open '" + VersionFileLocation + "'")
+		ShowErrorMessage("IOError", "Unable to open '" + VersionFileLocation + "'")
 
 func ToggleStreamingButtonsDisabled(Toggle: bool) -> void: 
 	SettingsToggle = !Toggle
@@ -125,13 +123,10 @@ func UpdateClock() -> void:
 	var CurrentHour = CurrentTime.hour % 12 if (CurrentTime.hour % 12 != 0) else 12
 	ClockLabel.text = "%2d:%02d %s" % [CurrentHour, CurrentTime.minute, Meridiem]
 
-func UpdateErrorLabel(ErrorTypeString: String, ErrorTypeMessage: String) -> void:
-	ErrorType.text = ErrorTypeString + ": "
-	ErrorMessage.text = ErrorTypeMessage
-	ErrorContainer.visible = true 
-	
-func HideErrorLabel() -> void:
-	ErrorContainer.visible = false 
+func ShowErrorMessage(ErrorMessageType: String, ErrorMessageLabel: String) -> void:
+	ErrorMenu.UpdateErrorMessage(ErrorMessageType, ErrorMessageLabel)
+	ErrorMenu.visible = true
+	ErrorMenu.ErrorAnimations.play("Fade In")
 		
 func ReturnButtonFromType(Type: String) -> Button:
 	match Type:
@@ -141,8 +136,6 @@ func ReturnButtonFromType(Type: String) -> Button:
 			return $OptionsBackground/OptionsBox/ServicesBox/Disney
 		"HBOMax":
 			return $OptionsBackground/OptionsBox/ServicesBox/HBOMax
-		"Hulu":
-			return $OptionsBackground/OptionsBox/ServicesBox/Hulu
 		"Netflix":
 			return $OptionsBackground/OptionsBox/ServicesBox/Netflix
 		"Paramount":
