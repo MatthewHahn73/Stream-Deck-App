@@ -78,7 +78,7 @@ func LoadBashScriptSettings() -> int:
 				else:
 					ShowErrorMessage("IO Error", "Unable to load the blueprint conf file at " + ConfBlueprintLocation)
 			else:
-				ShowErrorMessage("Program Config Error", "Unable to find selected flatpak " + BrowserFlatpakLink)
+				ShowErrorMessage("Program Error", "Unable to find selected flatpak " + BrowserFlatpakLink)
 		else:
 			ShowErrorMessage("Browser Error", "Unable to find one of the following browsers (Flatpak): Firefox, Google Chrome, Librewolf, Microsoft Edge, Opera")
 	BlueprintFile.close()
@@ -146,7 +146,10 @@ func LoadWebBrowserApplication(ServiceType: String) -> void:
 func LoadOtherApplication(ApplicationType) -> void:
 	match ApplicationType:
 		"Freetube":
-			OS.execute_with_pipe("flatpak", ["run", StreamingLinks["Flatpaks"][ApplicationType]])  
+			if SettingsMenu.FlatpakIsInstalled(StreamingLinks["Flatpaks"][ApplicationType]) == 0:
+				OS.execute_with_pipe("flatpak", ["run", StreamingLinks["Flatpaks"][ApplicationType]])  
+			else:
+				ShowErrorMessage("Program Error", "Unable to find selected flatpak " + StreamingLinks["Flatpaks"][ApplicationType])
 		_:
 			pass
 		
