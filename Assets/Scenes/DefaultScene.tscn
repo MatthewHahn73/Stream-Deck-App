@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3 uid="uid://dqj23206f0dsw"]
+[gd_scene load_steps=32 format=3 uid="uid://dqj23206f0dsw"]
 
 [ext_resource type="Texture2D" uid="uid://b24t74v8syjmc" path="res://Assets/Textures/Backgrounds/OptionsBackground.png" id="1_6kbbk"]
 [ext_resource type="Texture2D" uid="uid://d4f1gstadffqk" path="res://Assets/Textures/Icons/PowerIcon.png" id="1_wbwc7"]
@@ -15,6 +15,7 @@
 [ext_resource type="Theme" uid="uid://ow000d0w1g6a" path="res://Assets/Custom Themes/SettingsTheme.tres" id="13_xvm51"]
 [ext_resource type="PackedScene" uid="uid://dtffkgleva4vo" path="res://Assets/Scenes/ErrorScene.tscn" id="14_p1b5j"]
 [ext_resource type="Texture2D" uid="uid://bnberx0u0k7gg" path="res://Assets/Textures/Logo Backgrounds/AppleTV.png" id="15_mbpuf"]
+[ext_resource type="PackedScene" uid="uid://1stnqodxk3fa" path="res://Assets/Scenes/YoutubeSelectionScene.tscn" id="15_tp87p"]
 [ext_resource type="AudioStream" uid="uid://bv63xjbpfg0xp" path="res://Assets/Sounds/BlipSound.wav" id="16_8f2q7"]
 [ext_resource type="Texture2D" uid="uid://cmumda413s570" path="res://Assets/Textures/Logo Backgrounds/Disney.png" id="16_p1b5j"]
 [ext_resource type="Texture2D" uid="uid://cw7s3jhgxvfo6" path="res://Assets/Textures/Logo Backgrounds/HBOMax.png" id="17_tp87p"]
@@ -274,7 +275,7 @@ layout_mode = 2
 layout_mode = 2
 theme = ExtResource("4_ww48f")
 theme_override_constants/outline_size = 7
-text = "Steam Deck Streaming"
+text = "Stream Deck"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -399,6 +400,10 @@ layout_mode = 2
 theme = ExtResource("13_xvm51")
 theme_override_font_sizes/font_size = 25
 
+[node name="YoutubeSelectionScene" parent="." instance=ExtResource("15_tp87p")]
+visible = false
+layout_mode = 1
+
 [node name="ErrorScene" parent="." instance=ExtResource("14_p1b5j")]
 visible = false
 layout_mode = 1
@@ -445,7 +450,7 @@ resources = [PackedStringArray("AppleTV", "Disney", "HBOMax", "Hulu", "Netflix",
 [connection signal="pressed" from="OptionsBackground/OptionsBox/ServicesBox/Paramount" to="." method="_on_any_service_button_pressed" binds= ["Paramount"]]
 [connection signal="mouse_entered" from="OptionsBackground/OptionsBox/ServicesBox/Youtube" to="." method="_on_service_button_mouse_entered" binds= ["Youtube"]]
 [connection signal="mouse_exited" from="OptionsBackground/OptionsBox/ServicesBox/Youtube" to="." method="_on_any_mouse_exited" binds= ["Youtube"]]
-[connection signal="pressed" from="OptionsBackground/OptionsBox/ServicesBox/Youtube" to="." method="_on_any_service_button_pressed" binds= ["Youtube"]]
+[connection signal="pressed" from="OptionsBackground/OptionsBox/ServicesBox/Youtube" to="." method="_on_any_service_button_pressed" binds= ["YoutubeSelection"]]
 [connection signal="mouse_entered" from="OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Power" to="." method="_on_other_buttons_mouse_entered"]
 [connection signal="pressed" from="OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Power" to="." method="_on_power_pressed"]
 [connection signal="mouse_entered" from="OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings" to="." method="_on_other_buttons_mouse_entered"]

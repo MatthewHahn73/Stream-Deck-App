@@ -12,12 +12,12 @@ func UpdateErrorMessage(ErrorType: String, ErrorMessage: String) -> void:
 	ErrorMessageLabel.text = ErrorMessage
 
 func _on_back_button_pressed() -> void:
-	ErrorAnimations.play("Fade Out")
+	ErrorAnimations.play("Load Out")
 
 func _on_back_button_mouse_entered() -> void:
 	if DefaultScript.MenuSettings["MenuSounds"]:
 		MenuSounds.play()
 
 func _on_error_animations_animation_finished(AnimationName: StringName) -> void:
-	if AnimationName == "Fade Out":
+	if AnimationName == "Load Out":
 		ErrorScene.visible = false 

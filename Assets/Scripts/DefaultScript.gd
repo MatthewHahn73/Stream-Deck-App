@@ -2,6 +2,7 @@ extends Control
 
 #Node Variables
 @onready var SettingsMenu: VBoxContainer = $SettingsControl/SettingsMenu
+@onready var YoutubeMenu: Control = $YoutubeSelectionScene
 @onready var ErrorMenu: Control = $ErrorScene
 @onready var AppVersion: Label = $OptionsBackground/OptionsBox/TopMargin/TitleBox/AppVersion
 @onready var ClockLabel: Label = $ClockMarginContainer/ClockLabel
@@ -14,9 +15,9 @@ extends Control
 
 #General Variables
 var SettingsToggle = true
-var UserStreamingPath = "user://Streaming/"
-var ConfBlueprintLocation = "user://Streaming/Config/StreamingBlueprint.conf"
-var ScriptSettingsLocation = "user://Streaming/Config/Streaming.conf"
+var UserStreamingPath = DetermineDebugging() + "://Streaming/"
+var ConfBlueprintLocation = DetermineDebugging() + "://Streaming/Config/StreamingBlueprint.conf"
+var ScriptSettingsLocation = DetermineDebugging() + "://Streaming/Config/Streaming.conf"
 var StreamingLinksLocation = "res://Assets/JSON/StreamingLinks.json"
 var VersionFileLocation = "res://Assets/JSON/Version.json"
 var StreamingLinks = {}
@@ -24,17 +25,15 @@ var CMDArguments = {}
 var MenuSettings = {}
 	
 #Custom Functions
+func DetermineDebugging() -> String:
+	var CurrentPath = OS.get_executable_path().get_base_dir()
+	if DirAccess.dir_exists_absolute(CurrentPath + "/Streaming/"):				#Project is compiled. Pull from executable location
+		return "user"
+	return "res"
+	
 func CheckForUserSettings() -> int: 
 	if not DirAccess.dir_exists_absolute(UserStreamingPath):					#Move the streaming folder to an accessable user directory, if necessary
-		var CurrentPath = OS.get_executable_path().get_base_dir()
-		var StreamingFolderPathDebugging = "res://Streaming/"
-		if DirAccess.dir_exists_absolute(CurrentPath + "/Streaming/"):			#Project is compiled. Pull from executable location
-			CopyDirectory(CurrentPath + "/Streaming/", UserStreamingPath)
-		elif DirAccess.dir_exists_absolute(StreamingFolderPathDebugging):		#Project is a godot debugging build. Pull from the resources path
-			CopyDirectory(StreamingFolderPathDebugging, UserStreamingPath)
-		else:
-			ShowErrorMessage("Error", "No Streaming folder exists at " + CurrentPath)
-			return 1 
+		CopyDirectory(OS.get_executable_path().get_base_dir() + "/Streaming/", UserStreamingPath)
 	return 0
 	
 func CopyDirectory(Source: String, Destination: String) -> void:
@@ -57,28 +56,31 @@ func LoadStreamingLinks() -> void:
 		var StreamingLinksJSON = JSON.new() 
 		if StreamingLinksJSON.parse(StreamingLinksFile.get_as_text()) == 0: 
 			StreamingLinks = StreamingLinksJSON.data 
-
+			
 func LoadBashScriptSettings() -> int:
 	var BlueprintFile = FileAccess.open(ConfBlueprintLocation, FileAccess.READ)
 	if BlueprintFile != null:
 		if SettingsMenu.BrowserOption.selected != -1:
-			var BrowserFlatpakLink = SettingsMenu.BrowserTable[str(SettingsMenu.BrowserOption.selected)]["Flatpak"]
+			var BrowserFlatpakLink = SettingsMenu.BrowserTable[str(SettingsMenu.BrowserOption.get_selected_id())]["Flatpak"]
 			if SettingsMenu.FlatpakIsInstalled(BrowserFlatpakLink) == 0:
 				var BlueprintText = BlueprintFile.get_as_text()
 				if BlueprintText:	#Load the resolution/browser settings
 					var ResolutionSize = get_viewport().get_visible_rect().size		#Set browser resolution to resolution of the application
 					var ResolutionString = str(int(ResolutionSize.x)) + "," + str(int(ResolutionSize.y))
+					var BlueprintTextFilled = BlueprintText.replace("<WindowSize>", ResolutionString).replace("<Browser>", BrowserFlatpakLink)
 					var ConfFile = FileAccess.open(ScriptSettingsLocation, FileAccess.WRITE)
-					BlueprintText = BlueprintText.replace("<WindowSize>", ResolutionString).replace("<Browser>", BrowserFlatpakLink)
-					ConfFile.store_string(BlueprintText)
-					ConfFile.close()
-					return 0
+					if ConfFile:
+						ConfFile.store_string(BlueprintTextFilled)
+						ConfFile.close()
+						return 0
+					else:
+						ShowErrorMessage("IO Error", "Unable to load the conf file at " + ScriptSettingsLocation)
 				else:
-					ShowErrorMessage("Error", "Unable to load the conf file at " + ConfBlueprintLocation)
+					ShowErrorMessage("IO Error", "Unable to load the blueprint conf file at " + ConfBlueprintLocation)
 			else:
-				ShowErrorMessage("Error", "Unable to find selected flatpak " + BrowserFlatpakLink)
+				ShowErrorMessage("Program Config Error", "Unable to find selected flatpak " + BrowserFlatpakLink)
 		else:
-			ShowErrorMessage("Error", "Unable to find an installed flatpak browser")
+			ShowErrorMessage("Browser Error", "Unable to find one of the following browsers (Flatpak): Firefox, Google Chrome, Librewolf, Microsoft Edge, Opera")
 	BlueprintFile.close()
 	return 1
 	
@@ -90,9 +92,9 @@ func LoadVersion() -> void:
 			var VersionData = VersionJSON.data 
 			AppVersion.text = VersionData["Version"]
 		else:
-			ShowErrorMessage("IOError", "Unable to load data from '" + VersionFileLocation + "'")
+			ShowErrorMessage("IO Error", "Unable to load data from '" + VersionFileLocation + "'")
 	else:
-		ShowErrorMessage("IOError", "Unable to open '" + VersionFileLocation + "'")
+		ShowErrorMessage("IO Error", "Unable to open '" + VersionFileLocation + "'")
 
 func ToggleStreamingButtonsDisabled(Toggle: bool) -> void: 
 	SettingsToggle = !Toggle
@@ -124,9 +126,29 @@ func UpdateClock() -> void:
 	ClockLabel.text = "%2d:%02d %s" % [CurrentHour, CurrentTime.minute, Meridiem]
 
 func ShowErrorMessage(ErrorMessageType: String, ErrorMessageLabel: String) -> void:
+	if YoutubeMenu.visible:
+		YoutubeMenu._on_back_button_pressed()
 	ErrorMenu.UpdateErrorMessage(ErrorMessageType, ErrorMessageLabel)
 	ErrorMenu.visible = true
-	ErrorMenu.ErrorAnimations.play("Fade In")
+	ErrorMenu.ErrorAnimations.play("Load In")
+	
+func ShowYoutubeSelection() -> void:
+	YoutubeMenu.visible = true
+	YoutubeMenu.YoutubeAnimations.play("Load In")
+	
+func LoadWebBrowserApplication(ServiceType: String) -> void: 
+	if LoadBashScriptSettings() == 0:	#If script settings successfully loaded, launch the browser
+		FindAndKillAnyActiveSessions()
+		OS.execute_with_pipe("bash", ["Streaming/LaunchApp.sh", StreamingLinks["Web Links"][ServiceType]])
+		if MenuSettings["AutoClose"]:
+			_on_power_pressed()
+			
+func LoadOtherApplication(ApplicationType) -> void:
+	match ApplicationType:
+		"Freetube":
+			OS.execute_with_pipe("flatpak", ["run", StreamingLinks["Flatpaks"][ApplicationType]])  
+		_:
+			pass
 		
 func ReturnButtonFromType(Type: String) -> Button:
 	match Type:
@@ -169,21 +191,20 @@ func _on_service_button_mouse_entered(ServiceType: String) -> void:
 		PreviewImage.texture = BackgroundImages.get_resource(ServiceType) 
 		LogoAnimations.play("Preview Fade In")		
 		
-func _on_other_buttons_mouse_entered() -> void:
-	if MenuSettings["MenuSounds"]:
-		MenuSounds.play()
-	
 func _on_any_mouse_exited(ServiceType: String) -> void:
 	var ServiceButtonEntered = ReturnButtonFromType(ServiceType)
 	if ServiceButtonEntered != null && !ServiceButtonEntered.disabled:
 		LogoAnimations.play("Preview Fade Out")		
 		
+func _on_other_buttons_mouse_entered() -> void:
+	if MenuSettings["MenuSounds"]:
+		MenuSounds.play()
+			
 func _on_any_service_button_pressed(ServiceType: String) -> void:
-	if LoadBashScriptSettings() == 0:	#If script settings successfully loaded, launch the browser
-		FindAndKillAnyActiveSessions()
-		OS.execute_with_pipe("bash", ["Streaming/LaunchApp.sh", StreamingLinks[ServiceType]])
-		if MenuSettings["AutoClose"]:
-			_on_power_pressed()
+	if ServiceType != "YoutubeSelection":
+		LoadWebBrowserApplication(ServiceType)
+	else:
+		ShowYoutubeSelection()
 
 func _on_settings_pressed() -> void:
 	ToggleStreamingButtonsDisabled(SettingsToggle) 
