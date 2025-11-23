@@ -1,4 +1,4 @@
-<p>Application that launches streaming services from the Steam Deck's 'Game Mode' interface</p>
+<p>Front end application that launches streaming services from the Steam Deck's 'Game Mode' interface</p>
 
 <h1>Supported Browsers</h1>
 <ul>

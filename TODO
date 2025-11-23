@@ -1,4 +1,0 @@
-Bugs
-    -Firefox will crash after a couple of different services are opened
-        -Find a way to close the browser if its open when the application closes
-        -Find a way to check for an existing open browser when launching
