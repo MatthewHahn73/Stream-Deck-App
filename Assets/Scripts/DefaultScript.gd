@@ -7,17 +7,21 @@ extends Control
 @onready var AppVersion: Label = $OptionsBackground/OptionsBox/TopMargin/TitleBox/AppVersion
 @onready var ClockLabel: Label = $ClockMarginContainer/ClockLabel
 @onready var ServicesBox: VBoxContainer = $OptionsBackground/OptionsBox/ServicesBox
+@onready var ConfigBox: HBoxContainer = $OptionsBackground/OptionsBox/BottomMargin/ConfigBox
 @onready var MenuSounds: AudioStreamPlayer = $MenuSounds
 @onready var SettingsAnimations: AnimationPlayer = $SettingsAnimations
 @onready var LogoAnimations: AnimationPlayer = $LogoAnimations
 @onready var PreviewImage: TextureRect = $PreviewImage
 @onready var BackgroundImages: ResourcePreloader = $PreloadedImages
+@onready var DefaultButton: Button = $OptionsBackground/OptionsBox/ServicesBox/Amazon
+@onready var DefaultButtonBack: TextureButton = $OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings
 
 #General Variables
 var SettingsToggle = true
 var UserStreamingPath = DetermineDebugging() + "://Streaming/"
 var ConfBlueprintLocation = DetermineDebugging() + "://Streaming/Config/StreamingBlueprint.conf"
 var ScriptSettingsLocation = DetermineDebugging() + "://Streaming/Config/Streaming.conf"
+var SettingsLocation = DetermineDebugging() + "://Streaming/Config/Settings.json"
 var StreamingLinksLocation = "res://Assets/JSON/StreamingLinks.json"
 var VersionFileLocation = "res://Assets/JSON/Version.json"
 var StreamingLinks = {}
@@ -96,10 +100,14 @@ func LoadVersion() -> void:
 	else:
 		ShowErrorMessage("IO Error", "Unable to open '" + VersionFileLocation + "'")
 
-func ToggleStreamingButtonsDisabled(Toggle: bool) -> void: 
+func ToggleMainButtonsDisabled(Toggle: bool) -> void: 
 	SettingsToggle = !Toggle
 	for StreamingButton in ServicesBox.get_children():
 		StreamingButton.disabled = Toggle
+		StreamingButton.focus_mode = FOCUS_NONE if Toggle else FOCUS_ALL
+	for ConfigButton in ConfigBox.get_children():
+		ConfigButton.disabled = Toggle
+		ConfigButton.focus_mode = FOCUS_NONE if Toggle else FOCUS_ALL
 		
 func ToggleSettingsMenu(Toggle: bool) -> void: 
 	if Toggle:
@@ -126,6 +134,7 @@ func UpdateClock() -> void:
 	ClockLabel.text = "%2d:%02d %s" % [CurrentHour, CurrentTime.minute, Meridiem]
 
 func ShowErrorMessage(ErrorMessageType: String, ErrorMessageLabel: String) -> void:
+	ToggleMainButtonsDisabled(true)
 	if YoutubeMenu.visible:
 		YoutubeMenu._on_back_button_pressed()
 	ErrorMenu.UpdateErrorMessage(ErrorMessageType, ErrorMessageLabel)
@@ -133,21 +142,30 @@ func ShowErrorMessage(ErrorMessageType: String, ErrorMessageLabel: String) -> vo
 	ErrorMenu.ErrorAnimations.play("Load In")
 	
 func ShowYoutubeSelection() -> void:
+	ToggleMainButtonsDisabled(true)
 	YoutubeMenu.visible = true
 	YoutubeMenu.YoutubeAnimations.play("Load In")
 	
 func LoadWebBrowserApplication(ServiceType: String) -> void: 
 	if LoadBashScriptSettings() == 0:	#If script settings successfully loaded, launch the browser
 		FindAndKillAnyActiveSessions()
-		OS.execute_with_pipe("bash", ["Streaming/LaunchApp.sh", StreamingLinks["Web Links"][ServiceType]])
-		if MenuSettings["AutoClose"]:
-			_on_power_pressed()
-			
+		var BrowserInstance = OS.create_process("bash", ["Streaming/LaunchBrowser.sh", StreamingLinks["Web Links"][ServiceType]])
+		if BrowserInstance != -1:
+			if MenuSettings["AutoClose"]:
+				_on_power_pressed()
+		else:
+			ShowErrorMessage("Program Error", "Unable to launch " + StreamingLinks["Web Links"][ServiceType])
+
 func LoadOtherApplication(ApplicationType) -> void:
 	match ApplicationType:
 		"Freetube":
 			if SettingsMenu.FlatpakIsInstalled(StreamingLinks["Flatpaks"][ApplicationType]) == 0:
-				OS.execute_with_pipe("flatpak", ["run", StreamingLinks["Flatpaks"][ApplicationType]])  
+				var ApplicationInstance = OS.create_process("flatpak", ["run", StreamingLinks["Flatpaks"][ApplicationType]])
+				if ApplicationInstance != -1:
+					if MenuSettings["AutoClose"]:
+						_on_power_pressed()
+				else:
+					ShowErrorMessage("Program Error", "Unable to launch " + StreamingLinks["Flatpaks"][ApplicationType])
 			else:
 				ShowErrorMessage("Program Error", "Unable to find selected flatpak " + StreamingLinks["Flatpaks"][ApplicationType])
 		_:
@@ -169,6 +187,10 @@ func ReturnButtonFromType(Type: String) -> Button:
 			return $OptionsBackground/OptionsBox/ServicesBox/Amazon
 		"Youtube":
 			return $OptionsBackground/OptionsBox/ServicesBox/Youtube
+		"Power":
+			return $OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Power
+		"Settings":
+			return $OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings
 		_:
 			return null
 			
@@ -181,12 +203,14 @@ func _ready() -> void:
 		SettingsMenu.LoadSettings()
 	if CMDArguments.has("AutoLaunch") && CMDArguments["AutoLaunch"] != null:			#If a command line argument for autolaunch was loaded, load that service 
 		_on_any_service_button_pressed(CMDArguments["AutoLaunch"])
-	
+	if Input.get_connected_joypads():												#Controller is connected
+		DefaultButton.grab_focus()														#Grab focus on the first available option
+
 func _process(_delta: float):
 	UpdateClock()
 	await get_tree().create_timer(1.0).timeout 		#Check every second instead of every frame
 		
-func _on_service_button_mouse_entered(ServiceType: String) -> void:
+func _on_button_focus_gained(ServiceType: String) -> void:
 	var ServiceButtonEntered = ReturnButtonFromType(ServiceType)
 	if ServiceButtonEntered != null && !ServiceButtonEntered.disabled:
 		if MenuSettings["MenuSounds"]:
@@ -194,14 +218,22 @@ func _on_service_button_mouse_entered(ServiceType: String) -> void:
 		PreviewImage.texture = BackgroundImages.get_resource(ServiceType) 
 		LogoAnimations.play("Preview Fade In")		
 		
-func _on_any_mouse_exited(ServiceType: String) -> void:
+func _on_button_focus_lost(ServiceType: String) -> void:
 	var ServiceButtonEntered = ReturnButtonFromType(ServiceType)
 	if ServiceButtonEntered != null && !ServiceButtonEntered.disabled:
 		LogoAnimations.play("Preview Fade Out")		
 		
-func _on_other_buttons_mouse_entered() -> void:
+func _on_other_buttons_focus_gained() -> void:
 	if MenuSettings["MenuSounds"]:
 		MenuSounds.play()
+				
+func _on_mouse_entered_focus_toggle(ServiceType: String, Focus: bool) -> void:
+	var ServiceButtonEntered = ReturnButtonFromType(ServiceType)
+	if ServiceButtonEntered != null && !ServiceButtonEntered.disabled:
+		if Focus:
+			ServiceButtonEntered.grab_focus()
+		else:
+			ServiceButtonEntered.release_focus()
 			
 func _on_any_service_button_pressed(ServiceType: String) -> void:
 	if ServiceType != "YoutubeSelection":
@@ -210,8 +242,12 @@ func _on_any_service_button_pressed(ServiceType: String) -> void:
 		ShowYoutubeSelection()
 
 func _on_settings_pressed() -> void:
-	ToggleStreamingButtonsDisabled(SettingsToggle) 
+	ToggleMainButtonsDisabled(SettingsToggle) 
 	ToggleSettingsMenu(!SettingsToggle)
-	
+	SettingsMenu.ToggleAllElementsFocusDisabled(SettingsToggle)
+	SettingsMenu.ToggleSettingsButtonsDisabledIfRequired()
+	if Input.get_connected_joypads():												#Controller is connected
+		SettingsMenu.BackButton.grab_focus()
+
 func _on_power_pressed() -> void:
 	get_tree().quit()

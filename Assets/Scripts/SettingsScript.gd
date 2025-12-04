@@ -12,7 +12,6 @@ extends VBoxContainer
 @onready var DefaultScript: Control = get_parent().get_parent() 	#DefaultScene Node
 
 #General Variables
-var SettingsLocation = "user://Streaming/Config/Settings.json"
 var BrowserTableLocation = "res://Assets/JSON/BrowserFlatpaks.json"
 var BrowserTable = {}
 
@@ -29,21 +28,25 @@ func LoadAvailableBrowserData() -> void:
 	
 func LoadSettings() -> void: 
 	#Check if file exists, if it doesn't create one
-	var SettingsFile = FileAccess.open(SettingsLocation, FileAccess.READ)
+	var SettingsDataLocal = LoadSettingsData()
+	BrowserOption.selected = SettingsDataLocal["Browser"]
+	MenuSoundsCheckbox.button_pressed = SettingsDataLocal["MenuSounds"]
+	AutoCloseCheckbox.button_pressed = SettingsDataLocal["AutoClose"]
+	SetMenuValues()
+		
+func LoadSettingsData() -> Dictionary:
+	var SettingsFile = FileAccess.open(DefaultScript.SettingsLocation, FileAccess.READ)
 	if SettingsFile != null:
 		var SettingsJSON = JSON.new() 
 		if SettingsJSON.parse(SettingsFile.get_as_text()) == 0: 
-			var SettingsData = SettingsJSON.data 
-			BrowserOption.selected = SettingsData["Browser"]
-			MenuSoundsCheckbox.button_pressed = SettingsData["MenuSounds"]
-			AutoCloseCheckbox.button_pressed = SettingsData["AutoClose"]
-			SetMenuValues()
+			return SettingsJSON.data 
 		else:
-			DefaultScript.UpdateErrorLabel("IOError", "Unable to load settings from '" + SettingsLocation + "'")
+			DefaultScript.UpdateErrorLabel("IOError", "Unable to load settings from '" + DefaultScript.SettingsLocation + "'")
 		SettingsFile.close()
 	else:
 		SaveSettings()
 		LoadSettings()
+	return {}
 		
 func SetMenuValues() -> void:
 	DefaultScript.MenuSettings["MenuSounds"] = MenuSoundsCheckbox.button_pressed
@@ -51,16 +54,31 @@ func SetMenuValues() -> void:
 		
 func SaveSettings() -> void: 
 	#Check if file exists, if it does, write to it, if not create a new one
-	var SettingsFile = FileAccess.open(SettingsLocation, FileAccess.WRITE)
+	var SettingsFile = FileAccess.open(DefaultScript.SettingsLocation, FileAccess.WRITE)
 	var SettingsJSON = JSON.new() 
 	SettingsJSON = {
-		"Browser" : BrowserOption.selected if BrowserOption.selected != -1 else 0, 
+		"Browser" : BrowserOption.selected, 
 		"MenuSounds" : MenuSoundsCheckbox.button_pressed, 
 		"AutoClose" : AutoCloseCheckbox.button_pressed
 	}
 	SettingsFile.store_string(JSON.stringify(SettingsJSON))
 	SettingsFile.close()
 	
+func ToggleSettingsButtonsDisabledIfRequired() -> void:
+	var FileSettingsData = LoadSettingsData()
+	var CurrentSettingsData = {
+		"Browser" : float(BrowserOption.selected), 
+		"MenuSounds" : MenuSoundsCheckbox.button_pressed, 
+		"AutoClose" : AutoCloseCheckbox.button_pressed
+	}
+	var ButtonToggleBool = (CurrentSettingsData == FileSettingsData)
+	SaveButton.disabled = ButtonToggleBool
+	SaveButton.focus_mode = FOCUS_NONE if ButtonToggleBool else FOCUS_ALL
+	
+func ToggleAllElementsFocusDisabled(Toggle: bool) -> void:
+	for Element in [BrowserOption, MenuSoundsCheckbox, AutoCloseCheckbox, BackButton, SaveButton]:
+		Element.focus_mode = FOCUS_NONE if Toggle else FOCUS_ALL
+		
 func FlatpakIsInstalled(Program: String) -> int: 
 	var TerminalOutput = [] 
 	OS.execute("flatpak", ["list", "--app"], TerminalOutput) 
@@ -74,35 +92,49 @@ func ReturnButtonFromType(Type: String) -> Button:
 			return $SettingsMargins/SettingsButtonContainer/BackButton
 		"Save":
 			return $SettingsMargins/SettingsButtonContainer/SaveButton
+		"MenuSounds":
+			return $MenuSoundsRow/CheckboxContainer/MenuSoundsButton
+		"AutoClose":
+			return $AutoCloseRow/CheckboxContainer/AutoCloseButton
 		_:
 			return null
 	
 #Trigger Functions
 func _ready() -> void:
-	SaveButton.disabled = true
 	LoadAvailableBrowserData()
 
-func _on_settings_save_button_pressed() -> void:
-	SaveSettings()
-	SetMenuValues()
-	if !SaveButton.disabled:
-		SaveButton.disabled = true
-	
-func _on_back_button_pressed() -> void:
-	DefaultScript._on_settings_pressed() 
-
-func _on_resolution_option_item_selected(_index: int) -> void:
-	if DefaultScript.MenuSettings["MenuSounds"]:
-		MenuClicks.play()
-	if SaveButton.disabled:
-		SaveButton.disabled = false
-
-func _on_browser_option_pressed() -> void:
-	if DefaultScript.MenuSettings["MenuSounds"]:
-		MenuClicks.play()
-
-func _on_button_mouse_entered(ButtonType: String) -> void:
+func _on_button_focus_gained(ButtonType: String) -> void:
 	var ButtonEntered = ReturnButtonFromType(ButtonType)
 	if ButtonEntered != null && !ButtonEntered.disabled:
 		if DefaultScript.MenuSettings["MenuSounds"]:
 			SettingSounds.play()
+
+func _on_mouse_entered_focus_toggle(ServiceType: String, Focus: bool) -> void:
+	var ServiceButtonEntered = ReturnButtonFromType(ServiceType)
+	if ServiceButtonEntered != null && !ServiceButtonEntered.disabled:
+		if Focus:
+			ServiceButtonEntered.grab_focus()
+		else:
+			ServiceButtonEntered.release_focus()
+						
+func _on_resolution_option_item_selected(_index: int) -> void:
+	if DefaultScript.MenuSettings["MenuSounds"]:
+		MenuClicks.play()
+	ToggleSettingsButtonsDisabledIfRequired()
+
+func _on_browser_option_pressed() -> void:
+	if DefaultScript.MenuSettings["MenuSounds"]:
+		MenuClicks.play()
+			
+func _on_settings_save_button_pressed() -> void:
+	SaveSettings()
+	SetMenuValues()
+	ToggleSettingsButtonsDisabledIfRequired()
+	BackButton.grab_focus()
+	
+func _on_back_button_pressed() -> void:
+	DefaultScript.ToggleMainButtonsDisabled(DefaultScript.SettingsToggle) 
+	DefaultScript.ToggleSettingsMenu(!DefaultScript.SettingsToggle)
+	ToggleAllElementsFocusDisabled(DefaultScript.SettingsToggle)
+	if Input.get_connected_joypads():												#Controller is connected
+		DefaultScript.DefaultButtonBack.grab_focus()

@@ -8,10 +8,10 @@
 [ext_resource type="Texture2D" uid="uid://qb2hoeibf52k" path="res://Assets/Textures/Icons/SettingsIcon.png" id="3_y4ecp"]
 [ext_resource type="Theme" uid="uid://ggaet022hl5u" path="res://Assets/Custom Themes/SideButtonTheme.tres" id="4_ww48f"]
 [ext_resource type="Texture2D" uid="uid://cjuji1mc6cdxl" path="res://Assets/Textures/Icons/SettingsIcon-Pressed.png" id="5_frl37"]
-[ext_resource type="Texture2D" uid="uid://dbiji0ouxu7p4" path="res://Assets/Textures/Icons/SettingsIcon-Hover.png" id="6_utu8n"]
 [ext_resource type="Texture2D" uid="uid://be7f67egfyd3o" path="res://Assets/Textures/Icons/PowerIcon-Pressed.png" id="8_utu8n"]
-[ext_resource type="Texture2D" uid="uid://d1n3screhwtk" path="res://Assets/Textures/Icons/PowerIcon-Hover.png" id="9_lhorl"]
+[ext_resource type="Texture2D" uid="uid://bkwwildmacrfc" path="res://Assets/Textures/Icons/PowerIcon-Focused.png" id="9_tp87p"]
 [ext_resource type="PackedScene" uid="uid://bqpjobh068c6u" path="res://Assets/Scenes/SettingsScene.tscn" id="11_utu8n"]
+[ext_resource type="Texture2D" uid="uid://vkcsjety0tao" path="res://Assets/Textures/Icons/SettingsIcon-Focused.png" id="12_tp87p"]
 [ext_resource type="Theme" uid="uid://ow000d0w1g6a" path="res://Assets/Custom Themes/SettingsTheme.tres" id="13_xvm51"]
 [ext_resource type="PackedScene" uid="uid://dtffkgleva4vo" path="res://Assets/Scenes/ErrorScene.tscn" id="14_p1b5j"]
 [ext_resource type="Texture2D" uid="uid://bnberx0u0k7gg" path="res://Assets/Textures/Logo Backgrounds/AppleTV.png" id="15_mbpuf"]
@@ -359,6 +359,7 @@ theme_override_constants/margin_bottom = 75
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 size_flags_vertical = 8
+theme_override_constants/separation = 16
 alignment = 1
 
 [node name="Power" type="TextureButton" parent="OptionsBackground/OptionsBox/BottomMargin/ConfigBox"]
@@ -366,20 +367,18 @@ custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 texture_normal = ExtResource("1_wbwc7")
 texture_pressed = ExtResource("8_utu8n")
-texture_hover = ExtResource("9_lhorl")
+texture_disabled = ExtResource("8_utu8n")
+texture_focused = ExtResource("9_tp87p")
 ignore_texture_size = true
 stretch_mode = 0
-
-[node name="Control" type="Control" parent="OptionsBackground/OptionsBox/BottomMargin/ConfigBox"]
-custom_minimum_size = Vector2(10, 0)
-layout_mode = 2
 
 [node name="Settings" type="TextureButton" parent="OptionsBackground/OptionsBox/BottomMargin/ConfigBox"]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 texture_normal = ExtResource("3_y4ecp")
 texture_pressed = ExtResource("5_frl37")
-texture_hover = ExtResource("6_utu8n")
+texture_disabled = ExtResource("5_frl37")
+texture_focused = ExtResource("12_tp87p")
 ignore_texture_size = true
 stretch_mode = 0
 
@@ -430,28 +429,46 @@ volume_db = -5.0
 [node name="PreloadedImages" type="ResourcePreloader" parent="."]
 resources = [PackedStringArray("AppleTV", "Disney", "HBOMax", "Hulu", "Netflix", "Paramount", "PrimeVideo", "Youtube"), [ExtResource("15_mbpuf"), ExtResource("16_p1b5j"), ExtResource("17_tp87p"), ExtResource("18_2pvwk"), ExtResource("19_te0b7"), ExtResource("20_2qp0i"), ExtResource("21_rxauu"), ExtResource("22_tj8bl")]]
 
-[connection signal="mouse_entered" from="OptionsBackground/OptionsBox/ServicesBox/Amazon" to="." method="_on_service_button_mouse_entered" binds= ["PrimeVideo"]]
-[connection signal="mouse_exited" from="OptionsBackground/OptionsBox/ServicesBox/Amazon" to="." method="_on_any_mouse_exited" binds= ["PrimeVideo"]]
+[connection signal="focus_entered" from="OptionsBackground/OptionsBox/ServicesBox/Amazon" to="." method="_on_button_focus_gained" binds= ["PrimeVideo"]]
+[connection signal="focus_exited" from="OptionsBackground/OptionsBox/ServicesBox/Amazon" to="." method="_on_button_focus_lost" binds= ["PrimeVideo"]]
+[connection signal="mouse_entered" from="OptionsBackground/OptionsBox/ServicesBox/Amazon" to="." method="_on_mouse_entered_focus_toggle" binds= ["PrimeVideo", true]]
+[connection signal="mouse_exited" from="OptionsBackground/OptionsBox/ServicesBox/Amazon" to="." method="_on_mouse_entered_focus_toggle" binds= ["PrimeVideo", false]]
 [connection signal="pressed" from="OptionsBackground/OptionsBox/ServicesBox/Amazon" to="." method="_on_any_service_button_pressed" binds= ["PrimeVideo"]]
-[connection signal="mouse_entered" from="OptionsBackground/OptionsBox/ServicesBox/AppleTV" to="." method="_on_service_button_mouse_entered" binds= ["AppleTV"]]
-[connection signal="mouse_exited" from="OptionsBackground/OptionsBox/ServicesBox/AppleTV" to="." method="_on_any_mouse_exited" binds= ["AppleTV"]]
+[connection signal="focus_entered" from="OptionsBackground/OptionsBox/ServicesBox/AppleTV" to="." method="_on_button_focus_gained" binds= ["AppleTV"]]
+[connection signal="focus_exited" from="OptionsBackground/OptionsBox/ServicesBox/AppleTV" to="." method="_on_button_focus_lost" binds= ["AppleTV"]]
+[connection signal="mouse_entered" from="OptionsBackground/OptionsBox/ServicesBox/AppleTV" to="." method="_on_mouse_entered_focus_toggle" binds= ["AppleTV", true]]
+[connection signal="mouse_exited" from="OptionsBackground/OptionsBox/ServicesBox/AppleTV" to="." method="_on_mouse_entered_focus_toggle" binds= ["AppleTV", false]]
 [connection signal="pressed" from="OptionsBackground/OptionsBox/ServicesBox/AppleTV" to="." method="_on_any_service_button_pressed" binds= ["AppleTV"]]
-[connection signal="mouse_entered" from="OptionsBackground/OptionsBox/ServicesBox/Disney" to="." method="_on_service_button_mouse_entered" binds= ["Disney"]]
-[connection signal="mouse_exited" from="OptionsBackground/OptionsBox/ServicesBox/Disney" to="." method="_on_any_mouse_exited" binds= ["Disney"]]
+[connection signal="focus_entered" from="OptionsBackground/OptionsBox/ServicesBox/Disney" to="." method="_on_button_focus_gained" binds= ["Disney"]]
+[connection signal="focus_exited" from="OptionsBackground/OptionsBox/ServicesBox/Disney" to="." method="_on_button_focus_lost" binds= ["Disney"]]
+[connection signal="mouse_entered" from="OptionsBackground/OptionsBox/ServicesBox/Disney" to="." method="_on_mouse_entered_focus_toggle" binds= ["Disney", true]]
+[connection signal="mouse_exited" from="OptionsBackground/OptionsBox/ServicesBox/Disney" to="." method="_on_mouse_entered_focus_toggle" binds= ["Disney", false]]
 [connection signal="pressed" from="OptionsBackground/OptionsBox/ServicesBox/Disney" to="." method="_on_any_service_button_pressed" binds= ["Disney"]]
-[connection signal="mouse_entered" from="OptionsBackground/OptionsBox/ServicesBox/HBOMax" to="." method="_on_service_button_mouse_entered" binds= ["HBOMax"]]
-[connection signal="mouse_exited" from="OptionsBackground/OptionsBox/ServicesBox/HBOMax" to="." method="_on_any_mouse_exited" binds= ["HBOMax"]]
+[connection signal="focus_entered" from="OptionsBackground/OptionsBox/ServicesBox/HBOMax" to="." method="_on_button_focus_gained" binds= ["HBOMax"]]
+[connection signal="focus_exited" from="OptionsBackground/OptionsBox/ServicesBox/HBOMax" to="." method="_on_button_focus_lost" binds= ["HBOMax"]]
+[connection signal="mouse_entered" from="OptionsBackground/OptionsBox/ServicesBox/HBOMax" to="." method="_on_mouse_entered_focus_toggle" binds= ["HBOMax", true]]
+[connection signal="mouse_exited" from="OptionsBackground/OptionsBox/ServicesBox/HBOMax" to="." method="_on_mouse_entered_focus_toggle" binds= ["HBOMax", false]]
 [connection signal="pressed" from="OptionsBackground/OptionsBox/ServicesBox/HBOMax" to="." method="_on_any_service_button_pressed" binds= ["HBOMax"]]
-[connection signal="mouse_entered" from="OptionsBackground/OptionsBox/ServicesBox/Netflix" to="." method="_on_service_button_mouse_entered" binds= ["Netflix"]]
-[connection signal="mouse_exited" from="OptionsBackground/OptionsBox/ServicesBox/Netflix" to="." method="_on_any_mouse_exited" binds= ["Netflix"]]
+[connection signal="focus_entered" from="OptionsBackground/OptionsBox/ServicesBox/Netflix" to="." method="_on_button_focus_gained" binds= ["Netflix"]]
+[connection signal="focus_exited" from="OptionsBackground/OptionsBox/ServicesBox/Netflix" to="." method="_on_button_focus_lost" binds= ["Netflix"]]
+[connection signal="mouse_entered" from="OptionsBackground/OptionsBox/ServicesBox/Netflix" to="." method="_on_mouse_entered_focus_toggle" binds= ["Netflix", true]]
+[connection signal="mouse_exited" from="OptionsBackground/OptionsBox/ServicesBox/Netflix" to="." method="_on_mouse_entered_focus_toggle" binds= ["Netflix", false]]
 [connection signal="pressed" from="OptionsBackground/OptionsBox/ServicesBox/Netflix" to="." method="_on_any_service_button_pressed" binds= ["Netflix"]]
-[connection signal="mouse_entered" from="OptionsBackground/OptionsBox/ServicesBox/Paramount" to="." method="_on_service_button_mouse_entered" binds= ["Paramount"]]
-[connection signal="mouse_exited" from="OptionsBackground/OptionsBox/ServicesBox/Paramount" to="." method="_on_any_mouse_exited" binds= ["Paramount"]]
+[connection signal="focus_entered" from="OptionsBackground/OptionsBox/ServicesBox/Paramount" to="." method="_on_button_focus_gained" binds= ["Paramount"]]
+[connection signal="focus_exited" from="OptionsBackground/OptionsBox/ServicesBox/Paramount" to="." method="_on_button_focus_lost" binds= ["Paramount"]]
+[connection signal="mouse_entered" from="OptionsBackground/OptionsBox/ServicesBox/Paramount" to="." method="_on_mouse_entered_focus_toggle" binds= ["Paramount", true]]
+[connection signal="mouse_exited" from="OptionsBackground/OptionsBox/ServicesBox/Paramount" to="." method="_on_mouse_entered_focus_toggle" binds= ["Paramount", false]]
 [connection signal="pressed" from="OptionsBackground/OptionsBox/ServicesBox/Paramount" to="." method="_on_any_service_button_pressed" binds= ["Paramount"]]
-[connection signal="mouse_entered" from="OptionsBackground/OptionsBox/ServicesBox/Youtube" to="." method="_on_service_button_mouse_entered" binds= ["Youtube"]]
-[connection signal="mouse_exited" from="OptionsBackground/OptionsBox/ServicesBox/Youtube" to="." method="_on_any_mouse_exited" binds= ["Youtube"]]
+[connection signal="focus_entered" from="OptionsBackground/OptionsBox/ServicesBox/Youtube" to="." method="_on_button_focus_gained" binds= ["Youtube"]]
+[connection signal="focus_exited" from="OptionsBackground/OptionsBox/ServicesBox/Youtube" to="." method="_on_button_focus_lost" binds= ["Youtube"]]
+[connection signal="mouse_entered" from="OptionsBackground/OptionsBox/ServicesBox/Youtube" to="." method="_on_mouse_entered_focus_toggle" binds= ["Youtube", true]]
+[connection signal="mouse_exited" from="OptionsBackground/OptionsBox/ServicesBox/Youtube" to="." method="_on_mouse_entered_focus_toggle" binds= ["Youtube", false]]
 [connection signal="pressed" from="OptionsBackground/OptionsBox/ServicesBox/Youtube" to="." method="_on_any_service_button_pressed" binds= ["YoutubeSelection"]]
-[connection signal="mouse_entered" from="OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Power" to="." method="_on_other_buttons_mouse_entered"]
+[connection signal="focus_entered" from="OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Power" to="." method="_on_other_buttons_focus_gained"]
+[connection signal="mouse_entered" from="OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Power" to="." method="_on_mouse_entered_focus_toggle" binds= ["Power", true]]
+[connection signal="mouse_exited" from="OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Power" to="." method="_on_mouse_entered_focus_toggle" binds= ["Power", false]]
 [connection signal="pressed" from="OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Power" to="." method="_on_power_pressed"]
-[connection signal="mouse_entered" from="OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings" to="." method="_on_other_buttons_mouse_entered"]
+[connection signal="focus_entered" from="OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings" to="." method="_on_other_buttons_focus_gained"]
+[connection signal="mouse_entered" from="OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings" to="." method="_on_mouse_entered_focus_toggle" binds= ["Settings", true]]
+[connection signal="mouse_exited" from="OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings" to="." method="_on_mouse_entered_focus_toggle" binds= ["Settings", false]]
 [connection signal="pressed" from="OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings" to="." method="_on_settings_pressed"]

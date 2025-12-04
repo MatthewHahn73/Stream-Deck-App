@@ -1,21 +1,13 @@
-[gd_resource type="Theme" load_steps=18 format=3 uid="uid://ow000d0w1g6a"]
+[gd_resource type="Theme" load_steps=17 format=3 uid="uid://ow000d0w1g6a"]
 
 [ext_resource type="FontFile" uid="uid://cot8h8sgty5bp" path="res://Assets/Fonts/MotivaSansBlack.woff.ttf" id="1_pghrr"]
 [ext_resource type="Texture2D" uid="uid://djygffu4u7bww" path="res://Assets/Textures/Icons/Checkbox-Checked.png" id="2_6pc7i"]
+[ext_resource type="StyleBox" uid="uid://c5m51467k53l3" path="res://Assets/Custom Themes/Button Themes/SettingsThemeFocus.tres" id="2_pefv8"]
 [ext_resource type="Texture2D" uid="uid://bi2ka6xt5omk0" path="res://Assets/Textures/Icons/Checkbox-Unchecked.png" id="2_pghrr"]
+[ext_resource type="StyleBox" uid="uid://b8ye71xdl20qq" path="res://Assets/Custom Themes/Button Themes/SettingsThemeCheckboxFocus.tres" id="5_4rj8o"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ws4qt"]
 bg_color = Color(0.054902, 0.0862745, 0.0941176, 0.501961)
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_p8565"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qx0sc"]
-bg_color = Color(0.0973366, 0.496428, 0.647797, 1)
-border_color = Color(0, 0, 0, 1)
 corner_radius_top_left = 5
 corner_radius_top_right = 5
 corner_radius_bottom_right = 5
@@ -35,8 +27,6 @@ corner_radius_top_left = 5
 corner_radius_top_right = 5
 corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_pghrr"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_6pc7i"]
 
@@ -79,13 +69,13 @@ bg_color = Color(0.0980392, 0.498039, 0.647059, 1)
 Button/font_sizes/font_size = 22
 Button/fonts/font = ExtResource("1_pghrr")
 Button/styles/disabled = SubResource("StyleBoxFlat_ws4qt")
-Button/styles/focus = SubResource("StyleBoxEmpty_p8565")
-Button/styles/hover = SubResource("StyleBoxFlat_qx0sc")
+Button/styles/focus = ExtResource("2_pefv8")
+Button/styles/hover = ExtResource("2_pefv8")
 Button/styles/normal = SubResource("StyleBoxFlat_lqgjh")
 Button/styles/pressed = SubResource("StyleBoxFlat_pefv8")
 CheckBox/icons/checked = ExtResource("2_6pc7i")
 CheckBox/icons/unchecked = ExtResource("2_pghrr")
-CheckBox/styles/hover = SubResource("StyleBoxEmpty_pghrr")
+CheckBox/styles/focus = ExtResource("5_4rj8o")
 CheckBox/styles/hover_pressed = SubResource("StyleBoxEmpty_6pc7i")
 CheckBox/styles/normal = SubResource("StyleBoxFlat_j620j")
 CheckBox/styles/pressed = SubResource("StyleBoxEmpty_pefv8")
