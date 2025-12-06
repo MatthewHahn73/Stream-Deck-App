@@ -13,18 +13,23 @@ extends Control
 @onready var LogoAnimations: AnimationPlayer = $LogoAnimations
 @onready var PreviewImage: TextureRect = $PreviewImage
 @onready var BackgroundImages: ResourcePreloader = $PreloadedImages
+@onready var UpdateRequest: HTTPRequest = $UpdateRequest
 @onready var DefaultButton: Button = $MainGUI/OptionsBackground/OptionsBox/ServicesBox/Amazon
 @onready var DefaultButtonBack: TextureButton = $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings
+@onready var UpdateButton: TextureButton = $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Update
 
 #General Variables
 var SettingsToggle = true
+var GithubLink = "https://github.com/MatthewHahn73/Stream-Deck-App/releases/download/<VersionNumber>/Streaming.Services.App.zip"
 var UserStreamingPath = DetermineDebugging() + "://Streaming/"
 var ConfBlueprintLocation = DetermineDebugging() + "://Streaming/Config/StreamingBlueprint.conf"
 var ScriptSettingsLocation = DetermineDebugging() + "://Streaming/Config/Streaming.conf"
 var SettingsLocation = DetermineDebugging() + "://Streaming/Config/Settings.json"
 var ScriptLocation = DetermineDebugging() + "://Streaming/LaunchBrowser.sh"
-var StreamingLinksLocation = "res://Assets/JSON/StreamingLinks.json"
-var VersionFileLocation = "res://Assets/JSON/Version.json"
+var ExecutableDirectory = "res://"
+var StreamingLinksLocation = ExecutableDirectory + "Assets/JSON/StreamingLinks.json"
+var VersionFileLocation = ExecutableDirectory + "Assets/JSON/Version.json"
+var UpdateFile = ExecutableDirectory + "LatestBuild.zip"
 var StreamingLinks = {}
 var CMDArguments = {}
 var MenuSettings = {}
@@ -38,7 +43,7 @@ func DetermineDebugging() -> String:	#Determines if the project is compiled and 
 
 func CheckForUserSettings() -> void: 	#Move the streaming folder to an accessable user directory in .local, if necessary
 	if not DirAccess.dir_exists_absolute(UserStreamingPath):					
-		CopyDirectory(OS.get_executable_path().get_base_dir() + "/Streaming/", UserStreamingPath)
+		CopyDirectory(ExecutableDirectory + "/Streaming/", UserStreamingPath)
 	
 func CopyDirectory(Source: String, Destination: String) -> void:	#Copies the 'Streaming' directory to the accessable user directory in .local
 	DirAccess.make_dir_recursive_absolute(Destination)
@@ -47,7 +52,7 @@ func CopyDirectory(Source: String, Destination: String) -> void:	#Copies the 'St
 		CopyDirectory(Source + Directory + "/", Destination + Directory + "/")	
 	for Filename in SourceDir.get_files():
 		SourceDir.copy(Source + Filename, Destination + Filename)
-		
+				
 func LoadArguments() -> void:	#Load arguments, if any
 	for Arg in OS.get_cmdline_args():
 		if Arg.contains("="):
@@ -94,6 +99,7 @@ func LoadVersion() -> void: #Loads the application version and sets it as the su
 		var VersionJSON = JSON.new() 
 		if VersionJSON.parse(VersionFile.get_as_text()) == 0: 
 			var VersionData = VersionJSON.data 
+			GithubLink = GithubLink.replace("<VersionNumber>", VersionData["Version"])
 			AppVersion.text = VersionData["Version"]
 		else:
 			ShowErrorMessage("IO Error", "Unable to load data from '" + VersionFileLocation + "'")
@@ -132,7 +138,35 @@ func UpdateClock() -> void:	#Setter function that updates the clock in the right
 	var Meridiem = ("AM" if CurrentTime.hour < 12 else "PM")
 	var CurrentHour = CurrentTime.hour % 12 if (CurrentTime.hour % 12 != 0) else 12
 	ClockLabel.text = "%2d:%02d %s" % [CurrentHour, CurrentTime.minute, Meridiem]
-
+		
+func UpdateApplication(_Result: int, ResponseCode: int, _Headers: PackedStringArray, _Body: PackedByteArray) -> void:
+	if ResponseCode == 200 && FileAccess.file_exists(UpdateFile): 
+		#Unzip the contents of the download to a folder in the directory
+		var UpdateFileAbsolute = ProjectSettings.globalize_path(UpdateFile)
+		var CurrentDirAccess = DirAccess.open(ExecutableDirectory)
+		var ZipReader = ZIPReader.new()
+		ZipReader.open(UpdateFileAbsolute)
+		var FilesInZip = ZipReader.get_files()
+		for CurrentFile in FilesInZip:	 
+			if CurrentFile.ends_with("/"):
+				CurrentDirAccess.make_dir_recursive(CurrentFile)
+				continue
+			CurrentDirAccess.make_dir_recursive(CurrentDirAccess.get_current_dir().path_join(CurrentFile).get_base_dir())
+			var File = FileAccess.open(CurrentDirAccess.get_current_dir().path_join(CurrentFile), FileAccess.WRITE)
+			var Buffer = ZipReader.read_file(CurrentFile)
+			File.store_buffer(Buffer)	
+			File.close() 
+		#Move the contents of the unzipped folder to the executable directory and the 'Streaming' folder to the user directory 
+		var UnzippedDirectory = ProjectSettings.globalize_path("res://Streaming.Services.App") + "/"
+		var ExecutableDirectoryAbsolute = ProjectSettings.globalize_path(ExecutableDirectory)
+		CopyDirectory(UnzippedDirectory, ExecutableDirectoryAbsolute)		#Move the contents of the unzipped folder to executable directory 
+		CopyDirectory(ExecutableDirectoryAbsolute + "/Streaming/", UserStreamingPath) 										#Move the 'Streaming' folder 
+		CurrentDirAccess.remove(UpdateFile)				#Delete the zip file
+		CurrentDirAccess.remove(UnzippedDirectory)		#Delete the Unzipped directory
+	else: 
+		ErrorMenu.UpdateErrorMessage("IO Error", "Unable to download update data from '" + GithubLink + "'")
+	ErrorMenu.ToggleErrorMessageAcknowledge(false)
+		 
 func ShowErrorMessage(ErrorMessageType: String, ErrorMessageLabel: String) -> void:	#Toggle function for the error message pop up
 	ToggleMainButtonsDisabled(true)
 	if YoutubeMenu.visible:
@@ -252,7 +286,14 @@ func _on_settings_pressed() -> void:
 		SettingsMenu.BackButton.grab_focus()
 
 func _on_update_pressed() -> void:
-	pass # Replace with function body.
+	if !UpdateButton.disabled:
+		UpdateRequest.use_threads = true
+		UpdateRequest.timeout = 20.0
+		UpdateRequest.download_file = UpdateFile
+		UpdateRequest.request_completed.connect(UpdateApplication) 
+		UpdateRequest.request(GithubLink)
+		ShowErrorMessage("Update Information", "Downloading the latest build (" + AppVersion.text + ") from Github ...")
+		ErrorMenu.ToggleErrorMessageAcknowledge(true)
 
 func _on_power_pressed() -> void:
 	get_tree().quit()

@@ -12,6 +12,10 @@ extends Control
 func UpdateErrorMessage(ErrorType: String, ErrorMessage: String) -> void:	#Setter function for the error message type and content
 	ErrorTypeLabel.text = ErrorType
 	ErrorMessageLabel.text = ErrorMessage
+	
+func ToggleErrorMessageAcknowledge(Toggle: bool) -> void:
+	BackButton.disabled = Toggle
+	BackButton.focus_mode = FOCUS_NONE if Toggle else FOCUS_ALL
 
 #Trigger Functions
 func _on_back_button_pressed() -> void:

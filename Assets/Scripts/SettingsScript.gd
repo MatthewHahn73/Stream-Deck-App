@@ -46,7 +46,11 @@ func LoadSettingsData() -> Dictionary:	#Grabs the user settings data from the 'S
 		SettingsFile.close()
 	else:	#'Settings.json' file doesn't exist, create a new one
 		SaveSettings()
-		LoadSettings()
+		return {
+			"Browser" : BrowserOption.selected, 
+			"MenuSounds" : MenuSoundsCheckbox.button_pressed, 
+			"AutoClose" : AutoCloseCheckbox.button_pressed
+		}
 	return {}
 		
 func SetMenuValues() -> void:	#Sets the values in settings to an accessable variable to be used in the main script
@@ -55,13 +59,16 @@ func SetMenuValues() -> void:	#Sets the values in settings to an accessable vari
 		
 func SaveSettings() -> void: 	#Saves the settings to the 'Settings.json' file in .local, if file doesn't exist, creates one
 	var SettingsFile = FileAccess.open(DefaultScript.SettingsLocation, FileAccess.WRITE)
-	var SettingsJSON = JSON.new() 
-	SettingsJSON = {
-		"Browser" : BrowserOption.selected, 
-		"MenuSounds" : MenuSoundsCheckbox.button_pressed, 
-		"AutoClose" : AutoCloseCheckbox.button_pressed
-	}
-	SettingsFile.store_string(JSON.stringify(SettingsJSON))
+	if SettingsFile != null:
+		var SettingsJSON = JSON.new() 
+		SettingsJSON = {
+			"Browser" : BrowserOption.selected, 
+			"MenuSounds" : MenuSoundsCheckbox.button_pressed, 
+			"AutoClose" : AutoCloseCheckbox.button_pressed
+		}
+		SettingsFile.store_string(JSON.stringify(SettingsJSON))
+	else:
+		DefaultScript.ShowErrorMessage("IOError", "Unable to write to settings file at '" + DefaultScript.SettingsLocation + "'")
 	SettingsFile.close()
 	
 func ToggleSaveButton() -> void:	#Reads in currently saved settings data and compares to see whether or not to disable the save button
