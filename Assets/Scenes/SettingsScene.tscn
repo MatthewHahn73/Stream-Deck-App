@@ -5,7 +5,18 @@
 [ext_resource type="Theme" uid="uid://ow000d0w1g6a" path="res://Assets/Custom Themes/SettingsTheme.tres" id="3_m1o7v"]
 [ext_resource type="AudioStream" uid="uid://cuwo3d8m3or0s" path="res://Assets/Sounds/Select.wav" id="4_lqgjh"]
 
-[node name="SettingsMenu" type="VBoxContainer"]
+[node name="SettingsScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(275, 89)
+script = ExtResource("1_f2bev")
+
+[node name="SettingsContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -17,41 +28,38 @@ offset_right = 275.0
 offset_bottom = 118.5
 grow_horizontal = 2
 grow_vertical = 2
-pivot_offset = Vector2(275, 89)
-alignment = 1
-script = ExtResource("1_f2bev")
 
-[node name="BrowserRow" type="HBoxContainer" parent="."]
+[node name="BrowserRow" type="HBoxContainer" parent="SettingsContainer"]
 layout_mode = 2
 
-[node name="BrowserLabel" type="Label" parent="BrowserRow"]
+[node name="BrowserLabel" type="Label" parent="SettingsContainer/BrowserRow"]
 layout_mode = 2
 size_flags_horizontal = 4
 theme = ExtResource("3_m1o7v")
 text = "Web Browser "
 
-[node name="BrowserOption" type="OptionButton" parent="BrowserRow"]
+[node name="BrowserOption" type="OptionButton" parent="SettingsContainer/BrowserRow"]
 custom_minimum_size = Vector2(300, 50)
 layout_mode = 2
 size_flags_horizontal = 10
 focus_mode = 0
 theme = ExtResource("3_m1o7v")
 
-[node name="MenuSoundsRow" type="HBoxContainer" parent="."]
+[node name="MenuSoundsRow" type="HBoxContainer" parent="SettingsContainer"]
 layout_mode = 2
 
-[node name="ResolutionLabel" type="Label" parent="MenuSoundsRow"]
+[node name="ResolutionLabel" type="Label" parent="SettingsContainer/MenuSoundsRow"]
 layout_mode = 2
 size_flags_horizontal = 0
 theme = ExtResource("3_m1o7v")
 text = "Menu Sounds"
 
-[node name="CheckboxContainer" type="Control" parent="MenuSoundsRow"]
+[node name="CheckboxContainer" type="Control" parent="SettingsContainer/MenuSoundsRow"]
 custom_minimum_size = Vector2(300, 50)
 layout_mode = 2
 size_flags_horizontal = 10
 
-[node name="MenuSoundsButton" type="CheckBox" parent="MenuSoundsRow/CheckboxContainer"]
+[node name="MenuSoundsButton" type="CheckBox" parent="SettingsContainer/MenuSoundsRow/CheckboxContainer"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -68,21 +76,21 @@ size_flags_horizontal = 3
 focus_mode = 0
 theme = ExtResource("3_m1o7v")
 
-[node name="AutoCloseRow" type="HBoxContainer" parent="."]
+[node name="AutoCloseRow" type="HBoxContainer" parent="SettingsContainer"]
 layout_mode = 2
 
-[node name="AutoClose" type="Label" parent="AutoCloseRow"]
+[node name="AutoClose" type="Label" parent="SettingsContainer/AutoCloseRow"]
 layout_mode = 2
 size_flags_horizontal = 0
 theme = ExtResource("3_m1o7v")
 text = "Close on Launch"
 
-[node name="CheckboxContainer" type="Control" parent="AutoCloseRow"]
+[node name="CheckboxContainer" type="Control" parent="SettingsContainer/AutoCloseRow"]
 custom_minimum_size = Vector2(300, 50)
 layout_mode = 2
 size_flags_horizontal = 10
 
-[node name="AutoCloseButton" type="CheckBox" parent="AutoCloseRow/CheckboxContainer"]
+[node name="AutoCloseButton" type="CheckBox" parent="SettingsContainer/AutoCloseRow/CheckboxContainer"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -99,16 +107,16 @@ size_flags_horizontal = 3
 focus_mode = 0
 theme = ExtResource("3_m1o7v")
 
-[node name="SettingsMargins" type="MarginContainer" parent="."]
+[node name="SettingsMargins" type="MarginContainer" parent="SettingsContainer"]
 layout_mode = 2
 theme_override_constants/margin_top = 25
 
-[node name="SettingsButtonContainer" type="HBoxContainer" parent="SettingsMargins"]
+[node name="SettingsButtonContainer" type="HBoxContainer" parent="SettingsContainer/SettingsMargins"]
 layout_mode = 2
 theme_override_constants/separation = 8
 alignment = 1
 
-[node name="BackButton" type="Button" parent="SettingsMargins/SettingsButtonContainer"]
+[node name="BackButton" type="Button" parent="SettingsContainer/SettingsMargins/SettingsButtonContainer"]
 custom_minimum_size = Vector2(150, 50)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -116,7 +124,7 @@ focus_mode = 0
 theme = ExtResource("3_m1o7v")
 text = "Back"
 
-[node name="SaveButton" type="Button" parent="SettingsMargins/SettingsButtonContainer"]
+[node name="SaveButton" type="Button" parent="SettingsContainer/SettingsMargins/SettingsButtonContainer"]
 custom_minimum_size = Vector2(150, 50)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -132,19 +140,19 @@ volume_db = -5.0
 stream = ExtResource("4_lqgjh")
 volume_db = -5.0
 
-[connection signal="item_selected" from="BrowserRow/BrowserOption" to="." method="_on_resolution_option_item_selected"]
-[connection signal="pressed" from="BrowserRow/BrowserOption" to="." method="_on_browser_option_pressed"]
-[connection signal="mouse_entered" from="MenuSoundsRow/CheckboxContainer/MenuSoundsButton" to="." method="_on_mouse_entered_focus_toggle" binds= ["MenuSounds", true]]
-[connection signal="mouse_exited" from="MenuSoundsRow/CheckboxContainer/MenuSoundsButton" to="." method="_on_mouse_entered_focus_toggle" binds= ["MenuSounds", false]]
-[connection signal="pressed" from="MenuSoundsRow/CheckboxContainer/MenuSoundsButton" to="." method="_on_resolution_option_item_selected" binds= [0]]
-[connection signal="mouse_entered" from="AutoCloseRow/CheckboxContainer/AutoCloseButton" to="." method="_on_mouse_entered_focus_toggle" binds= ["AutoClose", true]]
-[connection signal="mouse_exited" from="AutoCloseRow/CheckboxContainer/AutoCloseButton" to="." method="_on_mouse_entered_focus_toggle" binds= ["AutoClose", false]]
-[connection signal="pressed" from="AutoCloseRow/CheckboxContainer/AutoCloseButton" to="." method="_on_resolution_option_item_selected" binds= [0]]
-[connection signal="focus_entered" from="SettingsMargins/SettingsButtonContainer/BackButton" to="." method="_on_button_focus_gained" binds= ["Back"]]
-[connection signal="mouse_entered" from="SettingsMargins/SettingsButtonContainer/BackButton" to="." method="_on_mouse_entered_focus_toggle" binds= ["Back", true]]
-[connection signal="mouse_exited" from="SettingsMargins/SettingsButtonContainer/BackButton" to="." method="_on_mouse_entered_focus_toggle" binds= ["Back", false]]
-[connection signal="pressed" from="SettingsMargins/SettingsButtonContainer/BackButton" to="." method="_on_back_button_pressed"]
-[connection signal="focus_entered" from="SettingsMargins/SettingsButtonContainer/SaveButton" to="." method="_on_button_focus_gained" binds= ["Save"]]
-[connection signal="mouse_entered" from="SettingsMargins/SettingsButtonContainer/SaveButton" to="." method="_on_mouse_entered_focus_toggle" binds= ["Save", true]]
-[connection signal="mouse_exited" from="SettingsMargins/SettingsButtonContainer/SaveButton" to="." method="_on_mouse_entered_focus_toggle" binds= ["Save", false]]
-[connection signal="pressed" from="SettingsMargins/SettingsButtonContainer/SaveButton" to="." method="_on_settings_save_button_pressed"]
+[connection signal="item_selected" from="SettingsContainer/BrowserRow/BrowserOption" to="." method="_on_resolution_option_item_selected"]
+[connection signal="pressed" from="SettingsContainer/BrowserRow/BrowserOption" to="." method="_on_browser_option_pressed"]
+[connection signal="mouse_entered" from="SettingsContainer/MenuSoundsRow/CheckboxContainer/MenuSoundsButton" to="." method="_on_mouse_entered_focus_toggle" binds= ["MenuSounds", true]]
+[connection signal="mouse_exited" from="SettingsContainer/MenuSoundsRow/CheckboxContainer/MenuSoundsButton" to="." method="_on_mouse_entered_focus_toggle" binds= ["MenuSounds", false]]
+[connection signal="pressed" from="SettingsContainer/MenuSoundsRow/CheckboxContainer/MenuSoundsButton" to="." method="_on_resolution_option_item_selected" binds= [0]]
+[connection signal="mouse_entered" from="SettingsContainer/AutoCloseRow/CheckboxContainer/AutoCloseButton" to="." method="_on_mouse_entered_focus_toggle" binds= ["AutoClose", true]]
+[connection signal="mouse_exited" from="SettingsContainer/AutoCloseRow/CheckboxContainer/AutoCloseButton" to="." method="_on_mouse_entered_focus_toggle" binds= ["AutoClose", false]]
+[connection signal="pressed" from="SettingsContainer/AutoCloseRow/CheckboxContainer/AutoCloseButton" to="." method="_on_resolution_option_item_selected" binds= [0]]
+[connection signal="focus_entered" from="SettingsContainer/SettingsMargins/SettingsButtonContainer/BackButton" to="." method="_on_button_focus_gained" binds= ["Back"]]
+[connection signal="mouse_entered" from="SettingsContainer/SettingsMargins/SettingsButtonContainer/BackButton" to="." method="_on_mouse_entered_focus_toggle" binds= ["Back", true]]
+[connection signal="mouse_exited" from="SettingsContainer/SettingsMargins/SettingsButtonContainer/BackButton" to="." method="_on_mouse_entered_focus_toggle" binds= ["Back", false]]
+[connection signal="pressed" from="SettingsContainer/SettingsMargins/SettingsButtonContainer/BackButton" to="." method="_on_back_button_pressed"]
+[connection signal="focus_entered" from="SettingsContainer/SettingsMargins/SettingsButtonContainer/SaveButton" to="." method="_on_button_focus_gained" binds= ["Save"]]
+[connection signal="mouse_entered" from="SettingsContainer/SettingsMargins/SettingsButtonContainer/SaveButton" to="." method="_on_mouse_entered_focus_toggle" binds= ["Save", true]]
+[connection signal="mouse_exited" from="SettingsContainer/SettingsMargins/SettingsButtonContainer/SaveButton" to="." method="_on_mouse_entered_focus_toggle" binds= ["Save", false]]
+[connection signal="pressed" from="SettingsContainer/SettingsMargins/SettingsButtonContainer/SaveButton" to="." method="_on_settings_save_button_pressed"]

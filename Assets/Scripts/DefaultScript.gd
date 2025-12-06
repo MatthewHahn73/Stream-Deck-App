@@ -1,20 +1,20 @@
 extends Control
 
 #Node Variables
-@onready var SettingsMenu: VBoxContainer = $SettingsControl/SettingsMenu
+@onready var SettingsMenu: Control = $MainGUI/SettingsScene
 @onready var YoutubeMenu: Control = $YoutubeSelectionScene
 @onready var ErrorMenu: Control = $ErrorScene
-@onready var AppVersion: Label = $OptionsBackground/OptionsBox/TopMargin/TitleBox/AppVersion
+@onready var AppVersion: Label = $MainGUI/OptionsBackground/OptionsBox/TopMargin/TitleBox/AppVersion
 @onready var ClockLabel: Label = $ClockMarginContainer/ClockLabel
-@onready var ServicesBox: VBoxContainer = $OptionsBackground/OptionsBox/ServicesBox
-@onready var ConfigBox: HBoxContainer = $OptionsBackground/OptionsBox/BottomMargin/ConfigBox
+@onready var ServicesBox: VBoxContainer = $MainGUI/OptionsBackground/OptionsBox/ServicesBox
+@onready var ConfigBox: HBoxContainer = $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox
 @onready var MenuSounds: AudioStreamPlayer = $MenuSounds
 @onready var SettingsAnimations: AnimationPlayer = $SettingsAnimations
 @onready var LogoAnimations: AnimationPlayer = $LogoAnimations
 @onready var PreviewImage: TextureRect = $PreviewImage
 @onready var BackgroundImages: ResourcePreloader = $PreloadedImages
-@onready var DefaultButton: Button = $OptionsBackground/OptionsBox/ServicesBox/Amazon
-@onready var DefaultButtonBack: TextureButton = $OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings
+@onready var DefaultButton: Button = $MainGUI/OptionsBackground/OptionsBox/ServicesBox/Amazon
+@onready var DefaultButtonBack: TextureButton = $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings
 
 #General Variables
 var SettingsToggle = true
@@ -22,25 +22,25 @@ var UserStreamingPath = DetermineDebugging() + "://Streaming/"
 var ConfBlueprintLocation = DetermineDebugging() + "://Streaming/Config/StreamingBlueprint.conf"
 var ScriptSettingsLocation = DetermineDebugging() + "://Streaming/Config/Streaming.conf"
 var SettingsLocation = DetermineDebugging() + "://Streaming/Config/Settings.json"
+var ScriptLocation = DetermineDebugging() + "://Streaming/LaunchBrowser.sh"
 var StreamingLinksLocation = "res://Assets/JSON/StreamingLinks.json"
 var VersionFileLocation = "res://Assets/JSON/Version.json"
 var StreamingLinks = {}
 var CMDArguments = {}
 var MenuSettings = {}
 	
-#Custom Functions
-func DetermineDebugging() -> String:
+#Custom Functions	
+func DetermineDebugging() -> String:	#Determines if the project is compiled and sets paths depending on whether it is or not for debugging purposes
 	var CurrentPath = OS.get_executable_path().get_base_dir()
-	if DirAccess.dir_exists_absolute(CurrentPath + "/Streaming/"):				#Project is compiled. Pull from executable location
+	if DirAccess.dir_exists_absolute(CurrentPath + "/Streaming/"):
 		return "user"
 	return "res"
-	
-func CheckForUserSettings() -> int: 
-	if not DirAccess.dir_exists_absolute(UserStreamingPath):					#Move the streaming folder to an accessable user directory, if necessary
+
+func CheckForUserSettings() -> void: 	#Move the streaming folder to an accessable user directory in .local, if necessary
+	if not DirAccess.dir_exists_absolute(UserStreamingPath):					
 		CopyDirectory(OS.get_executable_path().get_base_dir() + "/Streaming/", UserStreamingPath)
-	return 0
 	
-func CopyDirectory(Source: String, Destination: String) -> void:
+func CopyDirectory(Source: String, Destination: String) -> void:	#Copies the 'Streaming' directory to the accessable user directory in .local
 	DirAccess.make_dir_recursive_absolute(Destination)
 	var SourceDir = DirAccess.open(Source)
 	for Directory in SourceDir.get_directories():
@@ -48,20 +48,20 @@ func CopyDirectory(Source: String, Destination: String) -> void:
 	for Filename in SourceDir.get_files():
 		SourceDir.copy(Source + Filename, Destination + Filename)
 		
-func LoadArguments() -> void:
+func LoadArguments() -> void:	#Load arguments, if any
 	for Arg in OS.get_cmdline_args():
 		if Arg.contains("="):
 			var KeyValue = Arg.split("=")
 			CMDArguments[KeyValue[0].trim_prefix("--")] = KeyValue[1]
 			
-func LoadStreamingLinks() -> void:
+func LoadStreamingLinks() -> void:	#Loads the website links and flatpak ids into a usable variable
 	var StreamingLinksFile = FileAccess.open(StreamingLinksLocation, FileAccess.READ)
 	if StreamingLinksFile != null:
 		var StreamingLinksJSON = JSON.new() 
 		if StreamingLinksJSON.parse(StreamingLinksFile.get_as_text()) == 0: 
 			StreamingLinks = StreamingLinksJSON.data 
 			
-func LoadBashScriptSettings() -> int:
+func LoadBashScriptSettings() -> int:	#Loads the user and application defined settings into the 'Streaming.conf' file using the 'StreamingBlueprint.conf' file as a blueprint
 	var BlueprintFile = FileAccess.open(ConfBlueprintLocation, FileAccess.READ)
 	if BlueprintFile != null:
 		if SettingsMenu.BrowserOption.selected != -1:
@@ -88,7 +88,7 @@ func LoadBashScriptSettings() -> int:
 	BlueprintFile.close()
 	return 1
 	
-func LoadVersion() -> void: 
+func LoadVersion() -> void: #Loads the application version and sets it as the subtitle
 	var VersionFile = FileAccess.open(VersionFileLocation, FileAccess.READ)
 	if VersionFile != null:
 		var VersionJSON = JSON.new() 
@@ -100,7 +100,7 @@ func LoadVersion() -> void:
 	else:
 		ShowErrorMessage("IO Error", "Unable to open '" + VersionFileLocation + "'")
 
-func ToggleMainButtonsDisabled(Toggle: bool) -> void: 
+func ToggleMainButtonsDisabled(Toggle: bool) -> void: 	#Toggles the website links, settings, and power buttons
 	SettingsToggle = !Toggle
 	for StreamingButton in ServicesBox.get_children():
 		StreamingButton.disabled = Toggle
@@ -109,31 +109,31 @@ func ToggleMainButtonsDisabled(Toggle: bool) -> void:
 		ConfigButton.disabled = Toggle
 		ConfigButton.focus_mode = FOCUS_NONE if Toggle else FOCUS_ALL
 		
-func ToggleSettingsMenu(Toggle: bool) -> void: 
+func ToggleSettingsMenu(Toggle: bool) -> void: 	#Toggles the settings menu 
 	if Toggle:
 		SettingsMenu.visible = Toggle
 		SettingsAnimations.play("Settings Load")
 	else:
-		SettingsAnimations.play_backwards("Settings Load")
+		SettingsAnimations.play("Settings Load Out")
 		
-func FindAndKillAnyActiveSessions() -> void:
+func FindAndKillAnyActiveSessions() -> void: #Kills any active flatpak sessions of the currently set web browser (eg. kills all firefox instances)
 	var TerminalOutput = [] 
 	OS.execute("flatpak", ["ps"], TerminalOutput) 
 	var RunningApplications = Array(TerminalOutput[0].split("\n"))
-	RunningApplications.pop_back()												#Remove the last empty string
+	RunningApplications.pop_back()	#Remove the last empty string
 	for CurrentApp in RunningApplications:
 		var CurrentAppStats = CurrentApp.split("\t")
 		var CurrentApplicationType = CurrentAppStats.get(2)
 		if CurrentApplicationType == SettingsMenu.BrowserTable[str(SettingsMenu.BrowserOption.selected)]["Flatpak"]:		
 			OS.execute_with_pipe("flatpak", ["kill", CurrentAppStats[0]])		#If open browser session is matched with currently selected browser then close it
 		
-func UpdateClock() -> void:
+func UpdateClock() -> void:	#Setter function that updates the clock in the right of the application
 	var CurrentTime = Time.get_time_dict_from_system()
 	var Meridiem = ("AM" if CurrentTime.hour < 12 else "PM")
 	var CurrentHour = CurrentTime.hour % 12 if (CurrentTime.hour % 12 != 0) else 12
 	ClockLabel.text = "%2d:%02d %s" % [CurrentHour, CurrentTime.minute, Meridiem]
 
-func ShowErrorMessage(ErrorMessageType: String, ErrorMessageLabel: String) -> void:
+func ShowErrorMessage(ErrorMessageType: String, ErrorMessageLabel: String) -> void:	#Toggle function for the error message pop up
 	ToggleMainButtonsDisabled(true)
 	if YoutubeMenu.visible:
 		YoutubeMenu._on_back_button_pressed()
@@ -141,27 +141,27 @@ func ShowErrorMessage(ErrorMessageType: String, ErrorMessageLabel: String) -> vo
 	ErrorMenu.visible = true
 	ErrorMenu.ErrorAnimations.play("Load In")
 	
-func ShowYoutubeSelection() -> void:
+func ShowYoutubeSelection() -> void:	#Toggle function for the youtube selection pop up
 	ToggleMainButtonsDisabled(true)
 	YoutubeMenu.visible = true
 	YoutubeMenu.YoutubeAnimations.play("Load In")
 	
-func LoadWebBrowserApplication(ServiceType: String) -> void: 
+func LoadWebBrowserApplication(ServiceType: String) -> void: 	#Loads a web browser and navigates to a given URL
 	if LoadBashScriptSettings() == 0:	#If script settings successfully loaded, launch the browser
 		FindAndKillAnyActiveSessions()
-		var BrowserInstance = OS.create_process("bash", ["Streaming/LaunchBrowser.sh", StreamingLinks["Web Links"][ServiceType]])
-		if BrowserInstance != -1:
+		var BrowserInstance = OS.execute_with_pipe("bash", [ProjectSettings.globalize_path(ScriptLocation), StreamingLinks["Web Links"][ServiceType]])
+		if BrowserInstance:
 			if MenuSettings["AutoClose"]:
 				_on_power_pressed()
 		else:
 			ShowErrorMessage("Program Error", "Unable to launch " + StreamingLinks["Web Links"][ServiceType])
-
-func LoadOtherApplication(ApplicationType) -> void:
+			
+func LoadOtherApplication(ApplicationType) -> void:	#Loads a given flatpak application
 	match ApplicationType:
 		"Freetube":
 			if SettingsMenu.FlatpakIsInstalled(StreamingLinks["Flatpaks"][ApplicationType]) == 0:
 				var ApplicationInstance = OS.create_process("flatpak", ["run", StreamingLinks["Flatpaks"][ApplicationType]])
-				if ApplicationInstance != -1:
+				if ApplicationInstance:
 					if MenuSettings["AutoClose"]:
 						_on_power_pressed()
 				else:
@@ -171,26 +171,28 @@ func LoadOtherApplication(ApplicationType) -> void:
 		_:
 			pass
 		
-func ReturnButtonFromType(Type: String) -> Button:
+func ReturnButtonFromType(Type: String) -> Button:	#Returns a UI button given a simple descriptor
 	match Type:
 		"AppleTV":
-			return $OptionsBackground/OptionsBox/ServicesBox/AppleTV
+			return $MainGUI/OptionsBackground/OptionsBox/ServicesBox/AppleTV
 		"Disney":
-			return $OptionsBackground/OptionsBox/ServicesBox/Disney
+			return $MainGUI/OptionsBackground/OptionsBox/ServicesBox/Disney
 		"HBOMax":
-			return $OptionsBackground/OptionsBox/ServicesBox/HBOMax
+			return $MainGUI/OptionsBackground/OptionsBox/ServicesBox/HBOMax
 		"Netflix":
-			return $OptionsBackground/OptionsBox/ServicesBox/Netflix
+			return $MainGUI/OptionsBackground/OptionsBox/ServicesBox/Netflix
 		"Paramount":
-			return $OptionsBackground/OptionsBox/ServicesBox/Paramount
+			return $MainGUI/OptionsBackground/OptionsBox/ServicesBox/Paramount
 		"PrimeVideo":
-			return $OptionsBackground/OptionsBox/ServicesBox/Amazon
+			return $MainGUI/OptionsBackground/OptionsBox/ServicesBox/Amazon
 		"Youtube":
-			return $OptionsBackground/OptionsBox/ServicesBox/Youtube
+			return $MainGUI/OptionsBackground/OptionsBox/ServicesBox/Youtube
 		"Power":
-			return $OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Power
+			return $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Power
+		"Update":
+			return $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Update
 		"Settings":
-			return $OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings
+			return $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings
 		_:
 			return null
 			
@@ -199,11 +201,11 @@ func _ready() -> void:
 	LoadArguments()
 	LoadVersion()
 	LoadStreamingLinks()
-	if CheckForUserSettings() == 0:
-		SettingsMenu.LoadSettings()
+	CheckForUserSettings()
+	SettingsMenu.LoadSettings()
 	if CMDArguments.has("AutoLaunch") && CMDArguments["AutoLaunch"] != null:			#If a command line argument for autolaunch was loaded, load that service 
 		_on_any_service_button_pressed(CMDArguments["AutoLaunch"])
-	if Input.get_connected_joypads():												#Controller is connected
+	if Input.get_connected_joypads():													#Controller is connected
 		DefaultButton.grab_focus()														#Grab focus on the first available option
 
 func _process(_delta: float):
@@ -245,9 +247,12 @@ func _on_settings_pressed() -> void:
 	ToggleMainButtonsDisabled(SettingsToggle) 
 	ToggleSettingsMenu(!SettingsToggle)
 	SettingsMenu.ToggleAllElementsFocusDisabled(SettingsToggle)
-	SettingsMenu.ToggleSettingsButtonsDisabledIfRequired()
+	SettingsMenu.ToggleSaveButton()
 	if Input.get_connected_joypads():												#Controller is connected
 		SettingsMenu.BackButton.grab_focus()
+
+func _on_update_pressed() -> void:
+	pass # Replace with function body.
 
 func _on_power_pressed() -> void:
 	get_tree().quit()
