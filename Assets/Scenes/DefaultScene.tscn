@@ -414,7 +414,13 @@ libraries = {
 &"": SubResource("AnimationLibrary_8f2q7")
 }
 
-[node name="UpdateRequest" type="HTTPRequest" parent="."]
+[node name="FetchLatestGithubRelease" type="HTTPRequest" parent="."]
+use_threads = true
+timeout = 20.0
+
+[node name="DownloadLatestGithubRelease" type="HTTPRequest" parent="."]
+use_threads = true
+timeout = 20.0
 
 [node name="PreloadedImages" type="ResourcePreloader" parent="."]
 resources = [PackedStringArray("AppleTV", "Disney", "HBOMax", "Hulu", "Netflix", "Paramount", "PrimeVideo", "Youtube"), [ExtResource("15_mbpuf"), ExtResource("16_p1b5j"), ExtResource("17_tp87p"), ExtResource("18_2pvwk"), ExtResource("19_te0b7"), ExtResource("20_2qp0i"), ExtResource("21_rxauu"), ExtResource("22_tj8bl")]]

@@ -4,6 +4,8 @@ extends Control
 @onready var SettingsMenu: Control = $MainGUI/SettingsScene
 @onready var YoutubeMenu: Control = $YoutubeSelectionScene
 @onready var ErrorMenu: Control = $ErrorScene
+@onready var FetchLatestGithubReleaseRequest: HTTPRequest = $FetchLatestGithubRelease
+@onready var DownloadLatestGithubReleaseRequest: HTTPRequest = $DownloadLatestGithubRelease
 @onready var AppVersion: Label = $MainGUI/OptionsBackground/OptionsBox/TopMargin/TitleBox/AppVersion
 @onready var ClockLabel: Label = $ClockMarginContainer/ClockLabel
 @onready var ServicesBox: VBoxContainer = $MainGUI/OptionsBackground/OptionsBox/ServicesBox
@@ -13,26 +15,29 @@ extends Control
 @onready var LogoAnimations: AnimationPlayer = $LogoAnimations
 @onready var PreviewImage: TextureRect = $PreviewImage
 @onready var BackgroundImages: ResourcePreloader = $PreloadedImages
-@onready var UpdateRequest: HTTPRequest = $UpdateRequest
 @onready var DefaultButton: Button = $MainGUI/OptionsBackground/OptionsBox/ServicesBox/Amazon
 @onready var DefaultButtonBack: TextureButton = $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings
 @onready var UpdateButton: TextureButton = $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Update
 
-#General Variables
-var SettingsToggle = true
-var GithubLink = "https://github.com/MatthewHahn73/Stream-Deck-App/releases/download/<VersionNumber>/Streaming.Services.App.zip"
-var UserStreamingPath = DetermineDebugging() + "://Streaming/"
-var ConfBlueprintLocation = DetermineDebugging() + "://Streaming/Config/StreamingBlueprint.conf"
-var ScriptSettingsLocation = DetermineDebugging() + "://Streaming/Config/Streaming.conf"
-var SettingsLocation = DetermineDebugging() + "://Streaming/Config/Settings.json"
-var ScriptLocation = DetermineDebugging() + "://Streaming/LaunchBrowser.sh"
+#Static Variables
+var GithubLink = "https://api.github.com/repos/MatthewHahn73/Stream-Deck-App/releases/latest"
+var BuildType = DetermineDebugging()
+var ConfBlueprintLocation = BuildType + "://Streaming/Config/StreamingBlueprint.conf"
+var ScriptSettingsLocation = BuildType + "://Streaming/Config/Streaming.conf"
+var SettingsLocation = BuildType + "://Streaming/Config/Settings.json"
 var ExecutableDirectory = "res://"
 var StreamingLinksLocation = ExecutableDirectory + "Assets/JSON/StreamingLinks.json"
 var VersionFileLocation = ExecutableDirectory + "Assets/JSON/Version.json"
 var UpdateFile = ExecutableDirectory + "LatestBuild.zip"
+
+#Instance Variables
+var SettingsToggle = true
 var StreamingLinks = {}
 var CMDArguments = {}
 var MenuSettings = {}
+var DownloadLink = ""
+var NewReleaseVersion = ""
+
 	
 #Custom Functions	
 func DetermineDebugging() -> String:	#Determines if the project is compiled and sets paths depending on whether it is or not for debugging purposes
@@ -41,16 +46,17 @@ func DetermineDebugging() -> String:	#Determines if the project is compiled and 
 		return "user"
 	return "res"
 
-func CheckForUserSettings() -> void: 	#Move the streaming folder to an accessable user directory in .local, if necessary
-	if not DirAccess.dir_exists_absolute(UserStreamingPath):					
-		CopyDirectory(ExecutableDirectory + "/Streaming/", UserStreamingPath)
-	
+func MoveUserFilesIfApplicable() -> void: 	#Move the streaming folder to an accessable user directory in .local, if necessary
+	if BuildType == "user":
+		CopyDirectory(ExecutableDirectory + "/Streaming/", BuildType + "://Streaming/")
+			
 func CopyDirectory(Source: String, Destination: String) -> void:	#Copies the 'Streaming' directory to the accessable user directory in .local
 	DirAccess.make_dir_recursive_absolute(Destination)
 	var SourceDir = DirAccess.open(Source)
 	for Directory in SourceDir.get_directories():
 		CopyDirectory(Source + Directory + "/", Destination + Directory + "/")	
 	for Filename in SourceDir.get_files():
+		print(Source + Filename)
 		SourceDir.copy(Source + Filename, Destination + Filename)
 				
 func LoadArguments() -> void:	#Load arguments, if any
@@ -98,9 +104,7 @@ func LoadVersion() -> void: #Loads the application version and sets it as the su
 	if VersionFile != null:
 		var VersionJSON = JSON.new() 
 		if VersionJSON.parse(VersionFile.get_as_text()) == 0: 
-			var VersionData = VersionJSON.data 
-			GithubLink = GithubLink.replace("<VersionNumber>", VersionData["Version"])
-			AppVersion.text = VersionData["Version"]
+			AppVersion.text = VersionJSON.data["Version"]
 		else:
 			ShowErrorMessage("IO Error", "Unable to load data from '" + VersionFileLocation + "'")
 	else:
@@ -122,7 +126,7 @@ func ToggleSettingsMenu(Toggle: bool) -> void: 	#Toggles the settings menu
 	else:
 		SettingsAnimations.play("Settings Load Out")
 		
-func FindAndKillAnyActiveSessions() -> void: #Kills any active flatpak sessions of the currently set web browser (eg. kills all firefox instances)
+func FindAndKillAnyActiveSessions() -> void:	#Kills any active flatpak sessions of the currently set web browser (eg. kills all firefox instances)
 	var TerminalOutput = [] 
 	OS.execute("flatpak", ["ps"], TerminalOutput) 
 	var RunningApplications = Array(TerminalOutput[0].split("\n"))
@@ -133,46 +137,44 @@ func FindAndKillAnyActiveSessions() -> void: #Kills any active flatpak sessions 
 		if CurrentApplicationType == SettingsMenu.BrowserTable[str(SettingsMenu.BrowserOption.selected)]["Flatpak"]:		
 			OS.execute_with_pipe("flatpak", ["kill", CurrentAppStats[0]])		#If open browser session is matched with currently selected browser then close it
 		
-func UpdateClock() -> void:	#Setter function that updates the clock in the right of the application
+func UpdateClock() -> void:		#Setter function that updates the clock in the right of the application
 	var CurrentTime = Time.get_time_dict_from_system()
 	var Meridiem = ("AM" if CurrentTime.hour < 12 else "PM")
 	var CurrentHour = CurrentTime.hour % 12 if (CurrentTime.hour % 12 != 0) else 12
 	ClockLabel.text = "%2d:%02d %s" % [CurrentHour, CurrentTime.minute, Meridiem]
-		
-func UpdateApplication(_Result: int, ResponseCode: int, _Headers: PackedStringArray, _Body: PackedByteArray) -> void:
-	if ResponseCode == 200 && FileAccess.file_exists(UpdateFile): 
-		#Unzip the contents of the download to a folder in the directory
+	
+func DownloadLatestRelease() -> void:	#Sets the download file/location and makes an http request to download the file
+	DownloadLatestGithubReleaseRequest.download_file = UpdateFile
+	DownloadLatestGithubReleaseRequest.request(DownloadLink)
+	await DownloadLatestGithubReleaseRequest.request_completed
+	
+func DownloadLatestReleaseComplete(Result: int, ResponseCode: int, _Headers: PackedStringArray, _Body: PackedByteArray) -> void:
+	if Result == FetchLatestGithubReleaseRequest.RESULT_SUCCESS && ResponseCode == 200: 
 		var UpdateFileAbsolute = ProjectSettings.globalize_path(UpdateFile)
-		var CurrentDirAccess = DirAccess.open(ExecutableDirectory)
-		var ZipReader = ZIPReader.new()
-		ZipReader.open(UpdateFileAbsolute)
-		var FilesInZip = ZipReader.get_files()
-		for CurrentFile in FilesInZip:	 
-			if CurrentFile.ends_with("/"):
-				CurrentDirAccess.make_dir_recursive(CurrentFile)
-				continue
-			CurrentDirAccess.make_dir_recursive(CurrentDirAccess.get_current_dir().path_join(CurrentFile).get_base_dir())
-			var File = FileAccess.open(CurrentDirAccess.get_current_dir().path_join(CurrentFile), FileAccess.WRITE)
-			var Buffer = ZipReader.read_file(CurrentFile)
-			File.store_buffer(Buffer)	
-			File.close() 
-		#Move the contents of the unzipped folder to the executable directory and the 'Streaming' folder to the user directory 
-		var UnzippedDirectory = ProjectSettings.globalize_path("res://Streaming.Services.App") + "/"
-		var ExecutableDirectoryAbsolute = ProjectSettings.globalize_path(ExecutableDirectory)
-		CopyDirectory(UnzippedDirectory, ExecutableDirectoryAbsolute)		#Move the contents of the unzipped folder to executable directory 
-		CopyDirectory(ExecutableDirectoryAbsolute + "/Streaming/", UserStreamingPath) 										#Move the 'Streaming' folder 
-		CurrentDirAccess.remove(UpdateFile)				#Delete the zip file
-		CurrentDirAccess.remove(UnzippedDirectory)		#Delete the Unzipped directory
-	else: 
-		ErrorMenu.UpdateErrorMessage("IO Error", "Unable to download update data from '" + GithubLink + "'")
-	ErrorMenu.ToggleErrorMessageAcknowledge(false)
+		OS.execute("ark", ["--batch", UpdateFileAbsolute])																			#Unzip the contents of the download to a folder in the directory
+		OS.execute("rm", [UpdateFileAbsolute]) 						#Delete the zip file
+		OS.execute("rm", ["-r", ProjectSettings.globalize_path("res://Streaming.Services.App") + "/"])			#Delete the Unzipped directory
+		MoveUserFilesIfApplicable()
+
+func FetchLatestRelease() -> void:
+	FetchLatestGithubReleaseRequest.request(GithubLink)
+	await FetchLatestGithubReleaseRequest.request_completed
+		
+func FetchLatestReleaseCompleted(Result: int, ResponseCode: int, _Headers: PackedStringArray, Body: PackedByteArray) -> void:
+	if Result == FetchLatestGithubReleaseRequest.RESULT_SUCCESS && ResponseCode == 200: 
+		var JSONDataObject = JSON.new()
+		var DecodedBody = Body.get_string_from_utf8()
+		if JSONDataObject.parse(DecodedBody) == 0:
+			var JSONData = JSONDataObject.data
+			DownloadLink = JSONData["assets"][0]["browser_download_url"]
+			NewReleaseVersion = JSONData["tag_name"]
 		 
 func ShowErrorMessage(ErrorMessageType: String, ErrorMessageLabel: String) -> void:	#Toggle function for the error message pop up
 	ToggleMainButtonsDisabled(true)
-	if YoutubeMenu.visible:
-		YoutubeMenu._on_back_button_pressed()
-	ErrorMenu.UpdateErrorMessage(ErrorMessageType, ErrorMessageLabel)
+	#if YoutubeMenu.visible:	???
+		#YoutubeMenu._on_back_button_pressed()
 	ErrorMenu.visible = true
+	ErrorMenu.UpdateErrorMessage(ErrorMessageType, ErrorMessageLabel)
 	ErrorMenu.ErrorAnimations.play("Load In")
 	
 func ShowYoutubeSelection() -> void:	#Toggle function for the youtube selection pop up
@@ -183,7 +185,7 @@ func ShowYoutubeSelection() -> void:	#Toggle function for the youtube selection 
 func LoadWebBrowserApplication(ServiceType: String) -> void: 	#Loads a web browser and navigates to a given URL
 	if LoadBashScriptSettings() == 0:	#If script settings successfully loaded, launch the browser
 		FindAndKillAnyActiveSessions()
-		var BrowserInstance = OS.execute_with_pipe("bash", [ProjectSettings.globalize_path(ScriptLocation), StreamingLinks["Web Links"][ServiceType]])
+		var BrowserInstance = OS.execute_with_pipe("bash", [ProjectSettings.globalize_path(BuildType + "://Streaming/LaunchBrowser.sh"), StreamingLinks["Web Links"][ServiceType]])
 		if BrowserInstance:
 			if MenuSettings["AutoClose"]:
 				_on_power_pressed()
@@ -235,13 +237,15 @@ func _ready() -> void:
 	LoadArguments()
 	LoadVersion()
 	LoadStreamingLinks()
-	CheckForUserSettings()
+	MoveUserFilesIfApplicable()
 	SettingsMenu.LoadSettings()
 	if CMDArguments.has("AutoLaunch") && CMDArguments["AutoLaunch"] != null:			#If a command line argument for autolaunch was loaded, load that service 
 		_on_any_service_button_pressed(CMDArguments["AutoLaunch"])
 	if Input.get_connected_joypads():													#Controller is connected
 		DefaultButton.grab_focus()														#Grab focus on the first available option
-
+	FetchLatestGithubReleaseRequest.request_completed.connect(FetchLatestReleaseCompleted) 
+	DownloadLatestGithubReleaseRequest.request_completed.connect(DownloadLatestReleaseComplete)
+	
 func _process(_delta: float):
 	UpdateClock()
 	await get_tree().create_timer(1.0).timeout 		#Check every second instead of every frame
@@ -282,18 +286,18 @@ func _on_settings_pressed() -> void:
 	ToggleSettingsMenu(!SettingsToggle)
 	SettingsMenu.ToggleAllElementsFocusDisabled(SettingsToggle)
 	SettingsMenu.ToggleSaveButton()
-	if Input.get_connected_joypads():												#Controller is connected
+	if Input.get_connected_joypads():	#Controller is connected
 		SettingsMenu.BackButton.grab_focus()
 
 func _on_update_pressed() -> void:
 	if !UpdateButton.disabled:
-		UpdateRequest.use_threads = true
-		UpdateRequest.timeout = 20.0
-		UpdateRequest.download_file = UpdateFile
-		UpdateRequest.request_completed.connect(UpdateApplication) 
-		UpdateRequest.request(GithubLink)
-		ShowErrorMessage("Update Information", "Downloading the latest build (" + AppVersion.text + ") from Github ...")
-		ErrorMenu.ToggleErrorMessageAcknowledge(true)
-
+		ToggleMainButtonsDisabled(true) 
+		await FetchLatestRelease()
+		if NewReleaseVersion > AppVersion.text:
+			ShowErrorMessage("Info", "Update " + NewReleaseVersion + " found. Downloading ...")
+			await DownloadLatestRelease()
+		else:
+			ShowErrorMessage("Info", "Application is up to date")
+		
 func _on_power_pressed() -> void:
 	get_tree().quit()
