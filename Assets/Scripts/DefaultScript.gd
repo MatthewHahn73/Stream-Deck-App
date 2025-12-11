@@ -17,8 +17,9 @@ extends Control
 @onready var PreviewImage: TextureRect = $PreviewImage
 @onready var BackgroundImages: ResourcePreloader = $PreloadedImages
 @onready var DefaultButton: Button = $MainGUI/OptionsBackground/OptionsBox/ServicesBox/Amazon
-@onready var DefaultButtonBack: TextureButton = $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings
-@onready var UpdateButton: TextureButton = $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Update
+@onready var PowerButton: TextureButton = $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Power
+@onready var SettingButton: TextureButton = $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings
+@onready var UpdateButton: TextureButton = $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/UpdateControl/Update
 
 #Static Variables
 var GithubLink = "https://api.github.com/repos/MatthewHahn73/Stream-Deck-App/releases/latest"
@@ -115,17 +116,10 @@ func ToggleMainButtonsDisabled(Toggle: bool) -> void: 	#Toggles the website link
 	for StreamingButton in ServicesBox.get_children():
 		StreamingButton.disabled = Toggle
 		StreamingButton.focus_mode = FOCUS_NONE if Toggle else FOCUS_ALL
-	for ConfigButton in ConfigBox.get_children():
+	for ConfigButton in [PowerButton, UpdateButton, SettingButton]:
 		ConfigButton.disabled = Toggle
 		ConfigButton.focus_mode = FOCUS_NONE if Toggle else FOCUS_ALL
-		
-func ToggleSettingsMenu(Toggle: bool) -> void: 	#Toggles the settings menu 
-	if Toggle:
-		SettingsMenu.visible = Toggle
-		SettingsAnimations.play("Settings Load")
-	else:
-		SettingsAnimations.play("Settings Load Out")
-		
+				
 func FindAndKillAnyActiveSessions() -> void:	#Kills any active flatpak sessions of the currently set web browser (eg. kills all firefox instances)
 	var TerminalOutput = [] 
 	OS.execute("flatpak", ["ps"], TerminalOutput) 
@@ -152,7 +146,7 @@ func DownloadLatestReleaseComplete(Result: int, ResponseCode: int, _Headers: Pac
 	if Result == FetchLatestGithubReleaseRequest.RESULT_SUCCESS && ResponseCode == 200: 
 		ShowErrorMessage("Info", "Installing update ...")	
 		var UpdateFileAbsolute = ProjectSettings.globalize_path(UpdateFile)
-		OS.execute("ark", ["-b", UpdateFileAbsolute])														#Unzip the contents of the download to a folder in the directory
+		OS.execute("ark", ["-b", UpdateFileAbsolute])														#Use ark to unzip the contents of the download to a folder in the directory
 		var UnzippedAbsolutePath = ProjectSettings.globalize_path(ExecutableDirectory + "Streaming.Services.App/")
 		var ExecutableAbsolutePath = ProjectSettings.globalize_path(ExecutableDirectory)
 		CopyDirectory(UnzippedAbsolutePath, ExecutableAbsolutePath)
@@ -179,12 +173,20 @@ func FetchLatestReleaseCompleted(Result: int, ResponseCode: int, _Headers: Packe
 	else:
 		ShowErrorMessage("Error", "Attempt to get latest update version failed. Error code: " + str(ResponseCode))
 		ErrorMenu.ToggleErrorMessageAcknowledge(false)
-		 
-func ShowErrorMessage(ErrorMessageType: String, ErrorMessageLabel: String) -> void:	#Toggle function for the error message pop up
-	#print("Error Type: %, Error: %s" % [ErrorMessageType, ErrorMessageLabel])	#Log error to console as well
+
+func ShowSettingsMenu() -> void: 	#Toggles the settings menu 
+	ToggleMainButtonsDisabled(SettingsToggle) 
+	if PreviewImage.visible:
+		LogoAnimations.play("Preview Fade Out")		
+	SettingsAnimations.play("Settings Load")
+
+func ShowErrorMessage(ErrorMessageType: String, ErrorMessageLabel: String) -> void:							#Toggle function for the error message pop up
+	if ErrorMessageType != "Info":
+		print(ErrorMessageType + " - " + ErrorMessageLabel)													#Log errors to console
 	if !ErrorMenu.visible:	#Check if menu is already open
+		if PreviewImage.visible:
+			LogoAnimations.play("Preview Fade Out")	
 		ToggleMainButtonsDisabled(true)
-		ErrorMenu.visible = true
 		ErrorMenu.UpdateErrorMessage(ErrorMessageType, ErrorMessageLabel)
 		ErrorMenu.ErrorAnimations.play("Load In")
 	else:
@@ -192,7 +194,8 @@ func ShowErrorMessage(ErrorMessageType: String, ErrorMessageLabel: String) -> vo
 	
 func ShowYoutubeSelection() -> void:	#Toggle function for the youtube selection pop up
 	ToggleMainButtonsDisabled(true)
-	YoutubeMenu.visible = true
+	if PreviewImage.visible:
+		LogoAnimations.play("Preview Fade Out")	
 	YoutubeMenu.YoutubeAnimations.play("Load In")
 	
 func LoadWebBrowserApplication(ServiceType: String) -> void: 	#Loads a web browser and navigates to a given URL
@@ -239,7 +242,7 @@ func ReturnButtonFromType(Type: String) -> Button:	#Returns a UI button given a 
 		"Power":
 			return $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Power
 		"Update":
-			return $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Update
+			return $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/UpdateControl/Update
 		"Settings":
 			return $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings
 		_:
@@ -258,6 +261,8 @@ func _ready() -> void:
 		DefaultButton.grab_focus()														#Grab focus on the first available option
 	FetchLatestGithubReleaseRequest.request_completed.connect(FetchLatestReleaseCompleted) 
 	DownloadLatestGithubReleaseRequest.request_completed.connect(DownloadLatestReleaseComplete)
+	YoutubeMenu.visible = false
+	ErrorMenu.visible = false
 			
 func _on_button_focus_gained(ServiceType: String) -> void:
 	var ServiceButtonEntered = ReturnButtonFromType(ServiceType)
@@ -291,8 +296,7 @@ func _on_any_service_button_pressed(ServiceType: String) -> void:
 		ShowYoutubeSelection()
 
 func _on_settings_pressed() -> void:
-	ToggleMainButtonsDisabled(SettingsToggle) 
-	ToggleSettingsMenu(!SettingsToggle)
+	ShowSettingsMenu()
 	SettingsMenu.ToggleAllElementsFocusDisabled(SettingsToggle)
 	SettingsMenu.ToggleSaveButton()
 	if Input.get_connected_joypads():	#Controller is connected

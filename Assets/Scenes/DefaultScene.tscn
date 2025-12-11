@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3 uid="uid://ctl4d7gduq701"]
+[gd_scene load_steps=39 format=3 uid="uid://ctl4d7gduq701"]
 
 [ext_resource type="Texture2D" uid="uid://b24t74v8syjmc" path="res://Assets/Textures/Backgrounds/OptionsBackground.png" id="1_6kbbk"]
 [ext_resource type="Texture2D" uid="uid://d4f1gstadffqk" path="res://Assets/Textures/Icons/PowerIcon.png" id="1_wbwc7"]
@@ -12,13 +12,13 @@
 [ext_resource type="Texture2D" uid="uid://bkwwildmacrfc" path="res://Assets/Textures/Icons/PowerIcon-Focused.png" id="9_tp87p"]
 [ext_resource type="Texture2D" uid="uid://cxb2105rh4htp" path="res://Assets/Textures/Icons/UpdateIcon.png" id="10_2pvwk"]
 [ext_resource type="Texture2D" uid="uid://dgsjrcntnwc2x" path="res://Assets/Textures/Icons/UpdateIcon-Pressed.png" id="11_2qp0i"]
-[ext_resource type="PackedScene" path="res://Assets/Scenes/SettingsScene.tscn" id="11_utu8n"]
+[ext_resource type="PackedScene" uid="uid://cbeo3fgtp5v78" path="res://Assets/Scenes/SettingsScene.tscn" id="11_utu8n"]
 [ext_resource type="Texture2D" uid="uid://c5uwxiwa0tdv5" path="res://Assets/Textures/Icons/UpdateIcon-Focused.png" id="12_rxauu"]
 [ext_resource type="Texture2D" uid="uid://vkcsjety0tao" path="res://Assets/Textures/Icons/SettingsIcon-Focused.png" id="12_tp87p"]
 [ext_resource type="Theme" uid="uid://ow000d0w1g6a" path="res://Assets/Custom Themes/SettingsTheme.tres" id="13_xvm51"]
-[ext_resource type="PackedScene" path="res://Assets/Scenes/ErrorScene.tscn" id="14_p1b5j"]
+[ext_resource type="PackedScene" uid="uid://cb72q736vpc1y" path="res://Assets/Scenes/ErrorScene.tscn" id="14_p1b5j"]
 [ext_resource type="Texture2D" uid="uid://bnberx0u0k7gg" path="res://Assets/Textures/Logo Backgrounds/AppleTV.png" id="15_mbpuf"]
-[ext_resource type="PackedScene" path="res://Assets/Scenes/YoutubeSelectionScene.tscn" id="15_tp87p"]
+[ext_resource type="PackedScene" uid="uid://b32bhnphld1jv" path="res://Assets/Scenes/YoutubeSelectionScene.tscn" id="15_tp87p"]
 [ext_resource type="AudioStream" uid="uid://ch73ixjbo5k4l" path="res://Assets/Sounds/BlipSound.wav" id="16_8f2q7"]
 [ext_resource type="Texture2D" uid="uid://cmumda413s570" path="res://Assets/Textures/Logo Backgrounds/Disney.png" id="16_p1b5j"]
 [ext_resource type="Texture2D" uid="uid://cw7s3jhgxvfo6" path="res://Assets/Textures/Logo Backgrounds/HBOMax.png" id="17_tp87p"]
@@ -28,6 +28,21 @@
 [ext_resource type="Texture2D" uid="uid://dbgxjuxbc675h" path="res://Assets/Textures/Logo Backgrounds/PrimeVideo.png" id="21_rxauu"]
 [ext_resource type="Texture2D" uid="uid://d3lymu2sggbqj" path="res://Assets/Textures/Logo Backgrounds/Youtube.png" id="22_tj8bl"]
 [ext_resource type="AudioStream" uid="uid://dg2x6yq7k52cl" path="res://Assets/Sounds/Select.wav" id="28_rxauu"]
+
+[sub_resource type="Animation" id="Animation_rxauu"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MainGUI/SettingsScene:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
 
 [sub_resource type="Animation" id="Animation_mbpuf"]
 resource_name = "Settings Load"
@@ -52,9 +67,21 @@ tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.5),
-"transitions": PackedFloat32Array(0.5, 0.5),
+"transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("MainGUI/SettingsScene:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
 }
 
 [sub_resource type="Animation" id="Animation_tp87p"]
@@ -84,9 +111,22 @@ tracks/1/keys = {
 "update": 0,
 "values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
 }
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("MainGUI/SettingsScene:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.5),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_tp87p"]
 _data = {
+&"RESET": SubResource("Animation_rxauu"),
 &"Settings Load": SubResource("Animation_mbpuf"),
 &"Settings Load Out": SubResource("Animation_tp87p")
 }
@@ -106,6 +146,18 @@ tracks/0/keys = {
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
 }
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("PreviewImage:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
 
 [sub_resource type="Animation" id="Animation_8f2q7"]
 resource_name = "Preview Fade Out"
@@ -122,6 +174,18 @@ tracks/0/keys = {
 "update": 0,
 "values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
 }
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("PreviewImage:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.3),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
 
 [sub_resource type="Animation" id="Animation_lv5e7"]
 length = 0.001
@@ -137,12 +201,32 @@ tracks/0/keys = {
 "update": 0,
 "values": [Color(1, 1, 1, 0)]
 }
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("PreviewImage:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_8f2q7"]
 _data = {
 &"Preview Fade In": SubResource("Animation_xvm51"),
 &"Preview Fade Out": SubResource("Animation_8f2q7"),
 &"RESET": SubResource("Animation_lv5e7")
+}
+
+[sub_resource type="Animation" id="Animation_tj8bl"]
+resource_name = "Error - Load In"
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_cjqub"]
+_data = {
+&"Error - Load In": SubResource("Animation_tj8bl")
 }
 
 [node name="DefaultScene" type="Control"]
@@ -361,9 +445,18 @@ texture_focused = ExtResource("9_tp87p")
 ignore_texture_size = true
 stretch_mode = 0
 
-[node name="Update" type="TextureButton" parent="MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox"]
+[node name="UpdateControl" type="Control" parent="MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox"]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
+
+[node name="Update" type="TextureButton" parent="MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/UpdateControl"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 texture_normal = ExtResource("10_2pvwk")
 texture_pressed = ExtResource("11_2qp0i")
 texture_disabled = ExtResource("11_2qp0i")
@@ -383,7 +476,6 @@ stretch_mode = 0
 
 [node name="SettingsScene" parent="MainGUI" instance=ExtResource("11_utu8n")]
 visible = false
-modulate = Color(1, 1, 1, 0)
 custom_minimum_size = Vector2(1412, 0)
 layout_mode = 1
 anchors_preset = 11
@@ -393,17 +485,10 @@ offset_right = 704.0
 grow_horizontal = 0
 
 [node name="YoutubeSelectionScene" parent="." instance=ExtResource("15_tp87p")]
-visible = false
 layout_mode = 1
 
 [node name="ErrorScene" parent="." instance=ExtResource("14_p1b5j")]
-visible = false
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
 
 [node name="SettingsAnimations" type="AnimationPlayer" parent="."]
 libraries = {
@@ -415,13 +500,18 @@ libraries = {
 &"": SubResource("AnimationLibrary_8f2q7")
 }
 
+[node name="IconAnimations" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_cjqub")
+}
+
 [node name="FetchLatestGithubRelease" type="HTTPRequest" parent="."]
 use_threads = true
-timeout = 20.0
+timeout = 10.0
 
 [node name="DownloadLatestGithubRelease" type="HTTPRequest" parent="."]
 use_threads = true
-timeout = 20.0
+timeout = 10.0
 
 [node name="ClockUpdates" type="Timer" parent="."]
 wait_time = 0.1
@@ -477,10 +567,10 @@ volume_db = -5.0
 [connection signal="mouse_entered" from="MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Power" to="." method="_on_mouse_entered_focus_toggle" binds= ["Power", true]]
 [connection signal="mouse_exited" from="MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Power" to="." method="_on_mouse_entered_focus_toggle" binds= ["Power", false]]
 [connection signal="pressed" from="MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Power" to="." method="_on_power_pressed"]
-[connection signal="focus_entered" from="MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Update" to="." method="_on_other_buttons_focus_gained"]
-[connection signal="mouse_entered" from="MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Update" to="." method="_on_mouse_entered_focus_toggle" binds= ["Update", true]]
-[connection signal="mouse_exited" from="MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Update" to="." method="_on_mouse_entered_focus_toggle" binds= ["Update", false]]
-[connection signal="pressed" from="MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Update" to="." method="_on_update_pressed"]
+[connection signal="focus_entered" from="MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/UpdateControl/Update" to="." method="_on_other_buttons_focus_gained"]
+[connection signal="mouse_entered" from="MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/UpdateControl/Update" to="." method="_on_mouse_entered_focus_toggle" binds= ["Update", true]]
+[connection signal="mouse_exited" from="MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/UpdateControl/Update" to="." method="_on_mouse_entered_focus_toggle" binds= ["Update", false]]
+[connection signal="pressed" from="MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/UpdateControl/Update" to="." method="_on_update_pressed"]
 [connection signal="focus_entered" from="MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings" to="." method="_on_other_buttons_focus_gained"]
 [connection signal="mouse_entered" from="MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings" to="." method="_on_mouse_entered_focus_toggle" binds= ["Settings", true]]
 [connection signal="mouse_exited" from="MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings" to="." method="_on_mouse_entered_focus_toggle" binds= ["Settings", false]]

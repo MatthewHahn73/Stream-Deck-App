@@ -35,7 +35,6 @@ func _on_error_animations_animation_finished(AnimationName: StringName) -> void:
 		if Input.get_connected_joypads():	#Controller is connected
 			BackButton.grab_focus()
 	if AnimationName == "Load Out":
-		ErrorScene.visible = false 
 		DefaultScript.ToggleMainButtonsDisabled(false)
 		if Input.get_connected_joypads():	#Controller is connected
 			DefaultScript.DefaultButton.grab_focus()

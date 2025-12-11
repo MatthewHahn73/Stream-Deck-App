@@ -38,7 +38,6 @@ func _on_youtube_selection_animations_animation_finished(AnimationName: StringNa
 		if Input.get_connected_joypads():	#Controller is connected
 			FreetubeButton.grab_focus()
 	if AnimationName == "Load Out":
-		YoutubeScene.visible = false 
 		DefaultScript.ToggleMainButtonsDisabled(false)
 		if Input.get_connected_joypads():	#Controller is connected
 			DefaultScript.DefaultButton.grab_focus()
