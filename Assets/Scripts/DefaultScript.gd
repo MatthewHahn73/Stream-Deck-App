@@ -38,17 +38,17 @@ var MenuSettings = {}
 var DownloadLink = ""
 var NewReleaseVersion = ""
 
-	
 #Custom Functions	
 func DetermineDebugging() -> String:	#Determines if the project is compiled and sets paths depending on whether it is or not for debugging purposes
-	var CurrentPath = OS.get_executable_path().get_base_dir()
-	if DirAccess.dir_exists_absolute(CurrentPath + "/Streaming/"):
-		return "user"
-	return "res"
+	if OS.has_feature("editor"):
+		return "res"
+	return "user"
 
 func MoveUserFilesIfApplicable() -> void: 	#Move the streaming folder to an accessable user directory in .local, if necessary
 	if BuildType == "user":
-		CopyDirectory(ExecutableDirectory + "/Streaming/", BuildType + "://Streaming/")
+		var ExecutableAbsolutePath = ProjectSettings.globalize_path(ExecutableDirectory + "Streaming/")
+		var UserFilesAbsolutePath = ProjectSettings.globalize_path(BuildType + "://Streaming/")
+		CopyDirectory(ExecutableAbsolutePath, UserFilesAbsolutePath)
 			
 func CopyDirectory(Source: String, Destination: String) -> void:	#Copies the 'Streaming' directory to the accessable user directory in .local
 	DirAccess.make_dir_recursive_absolute(Destination)
@@ -56,7 +56,6 @@ func CopyDirectory(Source: String, Destination: String) -> void:	#Copies the 'St
 	for Directory in SourceDir.get_directories():
 		CopyDirectory(Source + Directory + "/", Destination + Directory + "/")	
 	for Filename in SourceDir.get_files():
-		print(Source + Filename)
 		SourceDir.copy(Source + Filename, Destination + Filename)
 				
 func LoadArguments() -> void:	#Load arguments, if any
@@ -150,11 +149,19 @@ func DownloadLatestRelease() -> void:	#Sets the download file/location and makes
 	
 func DownloadLatestReleaseComplete(Result: int, ResponseCode: int, _Headers: PackedStringArray, _Body: PackedByteArray) -> void:
 	if Result == FetchLatestGithubReleaseRequest.RESULT_SUCCESS && ResponseCode == 200: 
+		ShowErrorMessage("Info", "Installing update ...")	
 		var UpdateFileAbsolute = ProjectSettings.globalize_path(UpdateFile)
-		OS.execute("ark", ["--batch", UpdateFileAbsolute])																			#Unzip the contents of the download to a folder in the directory
-		OS.execute("rm", [UpdateFileAbsolute]) 						#Delete the zip file
-		OS.execute("rm", ["-r", ProjectSettings.globalize_path("res://Streaming.Services.App") + "/"])			#Delete the Unzipped directory
+		OS.execute("ark", ["-b", UpdateFileAbsolute])														#Unzip the contents of the download to a folder in the directory
+		var UnzippedAbsolutePath = ProjectSettings.globalize_path(ExecutableDirectory + "Streaming.Services.App/")
+		var ExecutableAbsolutePath = ProjectSettings.globalize_path(ExecutableDirectory)
+		CopyDirectory(UnzippedAbsolutePath, ExecutableAbsolutePath)
+		OS.execute("rm", [UpdateFileAbsolute]) 																#Delete the zip file
+		OS.execute("rm", ["-r", UnzippedAbsolutePath])														#Delete the Unzipped directory
 		MoveUserFilesIfApplicable()
+		ShowErrorMessage("Info", "Update complete. Please restart the application")		
+	else:
+		ShowErrorMessage("Error", "Update failed. Error code: " + str(ResponseCode))
+	ErrorMenu.ToggleErrorMessageAcknowledge(false)
 
 func FetchLatestRelease() -> void:
 	FetchLatestGithubReleaseRequest.request(GithubLink)
@@ -168,14 +175,19 @@ func FetchLatestReleaseCompleted(Result: int, ResponseCode: int, _Headers: Packe
 			var JSONData = JSONDataObject.data
 			DownloadLink = JSONData["assets"][0]["browser_download_url"]
 			NewReleaseVersion = JSONData["tag_name"]
+	else:
+		ShowErrorMessage("Error", "Attempt to get latest update version failed. Error code: " + str(ResponseCode))
+		ErrorMenu.ToggleErrorMessageAcknowledge(false)
 		 
 func ShowErrorMessage(ErrorMessageType: String, ErrorMessageLabel: String) -> void:	#Toggle function for the error message pop up
-	ToggleMainButtonsDisabled(true)
-	#if YoutubeMenu.visible:	???
-		#YoutubeMenu._on_back_button_pressed()
-	ErrorMenu.visible = true
-	ErrorMenu.UpdateErrorMessage(ErrorMessageType, ErrorMessageLabel)
-	ErrorMenu.ErrorAnimations.play("Load In")
+	#print("Error Type: %, Error: %s" % [ErrorMessageType, ErrorMessageLabel])	#Log error to console as well
+	if !ErrorMenu.visible:	#Check if menu is already open
+		ToggleMainButtonsDisabled(true)
+		ErrorMenu.visible = true
+		ErrorMenu.UpdateErrorMessage(ErrorMessageType, ErrorMessageLabel)
+		ErrorMenu.ErrorAnimations.play("Load In")
+	else:
+		ErrorMenu.UpdateErrorMessage(ErrorMessageType, ErrorMessageLabel)
 	
 func ShowYoutubeSelection() -> void:	#Toggle function for the youtube selection pop up
 	ToggleMainButtonsDisabled(true)
@@ -245,11 +257,7 @@ func _ready() -> void:
 		DefaultButton.grab_focus()														#Grab focus on the first available option
 	FetchLatestGithubReleaseRequest.request_completed.connect(FetchLatestReleaseCompleted) 
 	DownloadLatestGithubReleaseRequest.request_completed.connect(DownloadLatestReleaseComplete)
-	
-func _process(_delta: float):
-	UpdateClock()
-	await get_tree().create_timer(1.0).timeout 		#Check every second instead of every frame
-		
+			
 func _on_button_focus_gained(ServiceType: String) -> void:
 	var ServiceButtonEntered = ReturnButtonFromType(ServiceType)
 	if ServiceButtonEntered != null && !ServiceButtonEntered.disabled:
@@ -293,11 +301,15 @@ func _on_update_pressed() -> void:
 	if !UpdateButton.disabled:
 		ToggleMainButtonsDisabled(true) 
 		await FetchLatestRelease()
-		if NewReleaseVersion > AppVersion.text:
+		if NewReleaseVersion > AppVersion.text:		#Update found, download and install update
 			ShowErrorMessage("Info", "Update " + NewReleaseVersion + " found. Downloading ...")
+			ErrorMenu.ToggleErrorMessageAcknowledge(true)
 			await DownloadLatestRelease()
-		else:
+		elif NewReleaseVersion == AppVersion.text:	#Update version is the same, no update necessary
 			ShowErrorMessage("Info", "Application is up to date")
 		
+func _on_clock_updates_timeout() -> void:
+	UpdateClock()
+
 func _on_power_pressed() -> void:
 	get_tree().quit()
