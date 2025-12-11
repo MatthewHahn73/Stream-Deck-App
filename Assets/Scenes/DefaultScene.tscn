@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3 uid="uid://dqj23206f0dsw"]
+[gd_scene load_steps=36 format=3 uid="uid://dqj23206f0dsw"]
 
 [ext_resource type="Texture2D" uid="uid://b24t74v8syjmc" path="res://Assets/Textures/Backgrounds/OptionsBackground.png" id="1_6kbbk"]
 [ext_resource type="Texture2D" uid="uid://d4f1gstadffqk" path="res://Assets/Textures/Icons/PowerIcon.png" id="1_wbwc7"]
@@ -19,7 +19,7 @@
 [ext_resource type="PackedScene" uid="uid://dtffkgleva4vo" path="res://Assets/Scenes/ErrorScene.tscn" id="14_p1b5j"]
 [ext_resource type="Texture2D" uid="uid://bnberx0u0k7gg" path="res://Assets/Textures/Logo Backgrounds/AppleTV.png" id="15_mbpuf"]
 [ext_resource type="PackedScene" uid="uid://1stnqodxk3fa" path="res://Assets/Scenes/YoutubeSelectionScene.tscn" id="15_tp87p"]
-[ext_resource type="AudioStream" uid="uid://bv63xjbpfg0xp" path="res://Assets/Sounds/BlipSound.wav" id="16_8f2q7"]
+[ext_resource type="AudioStream" uid="uid://ch73ixjbo5k4l" path="res://Assets/Sounds/BlipSound.wav" id="16_8f2q7"]
 [ext_resource type="Texture2D" uid="uid://cmumda413s570" path="res://Assets/Textures/Logo Backgrounds/Disney.png" id="16_p1b5j"]
 [ext_resource type="Texture2D" uid="uid://cw7s3jhgxvfo6" path="res://Assets/Textures/Logo Backgrounds/HBOMax.png" id="17_tp87p"]
 [ext_resource type="Texture2D" uid="uid://bnv2otgcfo8r4" path="res://Assets/Textures/Logo Backgrounds/Hulu.png" id="18_2pvwk"]
@@ -27,6 +27,7 @@
 [ext_resource type="Texture2D" uid="uid://dcthcl2dvnwsd" path="res://Assets/Textures/Logo Backgrounds/Paramount.png" id="20_2qp0i"]
 [ext_resource type="Texture2D" uid="uid://dbgxjuxbc675h" path="res://Assets/Textures/Logo Backgrounds/PrimeVideo.png" id="21_rxauu"]
 [ext_resource type="Texture2D" uid="uid://d3lymu2sggbqj" path="res://Assets/Textures/Logo Backgrounds/Youtube.png" id="22_tj8bl"]
+[ext_resource type="AudioStream" uid="uid://dg2x6yq7k52cl" path="res://Assets/Sounds/Select.wav" id="28_rxauu"]
 
 [sub_resource type="Animation" id="Animation_mbpuf"]
 resource_name = "Settings Load"
@@ -431,6 +432,10 @@ resources = [PackedStringArray("AppleTV", "Disney", "HBOMax", "Hulu", "Netflix",
 
 [node name="MenuSounds" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("16_8f2q7")
+volume_db = -5.0
+
+[node name="MenuClicks" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("28_rxauu")
 volume_db = -5.0
 
 [connection signal="focus_entered" from="MainGUI/OptionsBackground/OptionsBox/ServicesBox/Amazon" to="." method="_on_button_focus_gained" binds= ["PrimeVideo"]]

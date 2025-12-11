@@ -7,8 +7,6 @@ extends Control
 @onready var BackButton: Button = $SettingsContainer/SettingsMargins/SettingsButtonContainer/BackButton
 @onready var SaveButton: Button = $SettingsContainer/SettingsMargins/SettingsButtonContainer/SaveButton
 @onready var SettingsMenu: Control = $"."
-@onready var SettingSounds: AudioStreamPlayer = $MenuSounds
-@onready var MenuClicks: AudioStreamPlayer = $MenuClicks
 @onready var DefaultScript: Control = get_parent().get_parent() 	#DefaultScene Node
 
 #General Variables
@@ -114,7 +112,7 @@ func _on_button_focus_gained(ButtonType: String) -> void:
 	var ButtonEntered = ReturnButtonFromType(ButtonType)
 	if ButtonEntered != null && !ButtonEntered.disabled:
 		if DefaultScript.MenuSettings["MenuSounds"]:
-			SettingSounds.play()
+			DefaultScript.MenuBlips.play()
 
 func _on_mouse_entered_focus_toggle(ServiceType: String, Focus: bool) -> void:
 	var ServiceButtonEntered = ReturnButtonFromType(ServiceType)
@@ -126,12 +124,12 @@ func _on_mouse_entered_focus_toggle(ServiceType: String, Focus: bool) -> void:
 						
 func _on_resolution_option_item_selected(_index: int) -> void:
 	if DefaultScript.MenuSettings["MenuSounds"]:
-		MenuClicks.play()
+		DefaultScript.MenuClicks.play()
 	ToggleSaveButton()
 
 func _on_browser_option_pressed() -> void:
 	if DefaultScript.MenuSettings["MenuSounds"]:
-		MenuClicks.play()
+		DefaultScript.MenuClicks.play()
 			
 func _on_settings_save_button_pressed() -> void:
 	SaveSettings()

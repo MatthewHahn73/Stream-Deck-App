@@ -5,7 +5,7 @@
 [ext_resource type="Shader" uid="uid://d3ccmggvy2v2h" path="res://Assets/Custom Themes/Shaders/blur.gdshader" id="2_j2yka"]
 [ext_resource type="Script" uid="uid://d3oqb5425vy5k" path="res://Assets/Scripts/ErrorScript.gd" id="2_k8vt3"]
 [ext_resource type="Texture2D" uid="uid://dyai6p0xn0gyq" path="res://Assets/Textures/Backgrounds/White Background.png" id="2_oxsn0"]
-[ext_resource type="AudioStream" uid="uid://bv63xjbpfg0xp" path="res://Assets/Sounds/BlipSound.wav" id="4_kyx0k"]
+[ext_resource type="AudioStream" uid="uid://ch73ixjbo5k4l" path="res://Assets/Sounds/BlipSound.wav" id="4_kyx0k"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_swb5c"]
 shader = ExtResource("2_j2yka")
@@ -195,5 +195,7 @@ stream = ExtResource("4_kyx0k")
 volume_db = -5.0
 
 [connection signal="focus_entered" from="ErrorBoxTexture/Acknowledgement/BackButton" to="." method="_on_back_button_focus_gained"]
+[connection signal="mouse_entered" from="ErrorBoxTexture/Acknowledgement/BackButton" to="." method="_on_mouse_entered_focus_toggle" binds= [true]]
+[connection signal="mouse_exited" from="ErrorBoxTexture/Acknowledgement/BackButton" to="." method="_on_mouse_entered_focus_toggle" binds= [false]]
 [connection signal="pressed" from="ErrorBoxTexture/Acknowledgement/BackButton" to="." method="_on_back_button_pressed"]
 [connection signal="animation_finished" from="ErrorAnimations" to="." method="_on_error_animations_animation_finished"]

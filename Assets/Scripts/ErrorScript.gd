@@ -2,7 +2,6 @@ extends Control
 
 @onready var DefaultScript: Control = get_parent() 	#DefaultScene Node
 @onready var ErrorScene: Control = $"."
-@onready var MenuSounds: AudioStreamPlayer = $MenuSounds
 @onready var ErrorTypeLabel: Label = $ErrorBoxTexture/ErrorMessageMargins/ErrorMessageBox/ErrorMessageType
 @onready var ErrorMessageLabel: Label = $ErrorBoxTexture/ErrorMessageMargins/ErrorMessageBox/ErrorMessageText
 @onready var ErrorAnimations: AnimationPlayer = $ErrorAnimations
@@ -23,7 +22,13 @@ func _on_back_button_pressed() -> void:
 
 func _on_back_button_focus_gained() -> void:
 	if DefaultScript.MenuSettings["MenuSounds"]:
-		MenuSounds.play()
+		DefaultScript.MenuBlips.play()
+		
+func _on_mouse_entered_focus_toggle(Focus: bool) -> void:
+	if Focus:
+		BackButton.grab_focus()
+	else:
+		BackButton.release_focus()
 
 func _on_error_animations_animation_finished(AnimationName: StringName) -> void:
 	if AnimationName == "Load In":

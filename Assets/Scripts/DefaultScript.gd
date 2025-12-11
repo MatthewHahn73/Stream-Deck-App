@@ -10,7 +10,8 @@ extends Control
 @onready var ClockLabel: Label = $ClockMarginContainer/ClockLabel
 @onready var ServicesBox: VBoxContainer = $MainGUI/OptionsBackground/OptionsBox/ServicesBox
 @onready var ConfigBox: HBoxContainer = $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox
-@onready var MenuSounds: AudioStreamPlayer = $MenuSounds
+@onready var MenuBlips: AudioStreamPlayer = $MenuSounds
+@onready var MenuClicks: AudioStreamPlayer = $MenuClicks
 @onready var SettingsAnimations: AnimationPlayer = $SettingsAnimations
 @onready var LogoAnimations: AnimationPlayer = $LogoAnimations
 @onready var PreviewImage: TextureRect = $PreviewImage
@@ -262,7 +263,7 @@ func _on_button_focus_gained(ServiceType: String) -> void:
 	var ServiceButtonEntered = ReturnButtonFromType(ServiceType)
 	if ServiceButtonEntered != null && !ServiceButtonEntered.disabled:
 		if MenuSettings["MenuSounds"]:
-			MenuSounds.play()
+			MenuBlips.play()
 		PreviewImage.texture = BackgroundImages.get_resource(ServiceType) 
 		LogoAnimations.play("Preview Fade In")		
 		
@@ -273,7 +274,7 @@ func _on_button_focus_lost(ServiceType: String) -> void:
 		
 func _on_other_buttons_focus_gained() -> void:
 	if MenuSettings["MenuSounds"]:
-		MenuSounds.play()
+		MenuBlips.play()
 				
 func _on_mouse_entered_focus_toggle(ServiceType: String, Focus: bool) -> void:
 	var ServiceButtonEntered = ReturnButtonFromType(ServiceType)

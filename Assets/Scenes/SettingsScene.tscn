@@ -1,9 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://bqpjobh068c6u"]
+[gd_scene load_steps=3 format=3 uid="uid://bqpjobh068c6u"]
 
 [ext_resource type="Script" uid="uid://4ih31e7yg172" path="res://Assets/Scripts/SettingsScript.gd" id="1_f2bev"]
-[ext_resource type="AudioStream" uid="uid://bv63xjbpfg0xp" path="res://Assets/Sounds/BlipSound.wav" id="3_lqgjh"]
 [ext_resource type="Theme" uid="uid://ow000d0w1g6a" path="res://Assets/Custom Themes/SettingsTheme.tres" id="3_m1o7v"]
-[ext_resource type="AudioStream" uid="uid://cuwo3d8m3or0s" path="res://Assets/Sounds/Select.wav" id="4_lqgjh"]
 
 [node name="SettingsScene" type="Control"]
 layout_mode = 3
@@ -131,14 +129,6 @@ size_flags_horizontal = 4
 focus_mode = 0
 theme = ExtResource("3_m1o7v")
 text = "Save"
-
-[node name="MenuSounds" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("3_lqgjh")
-volume_db = -5.0
-
-[node name="MenuClicks" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("4_lqgjh")
-volume_db = -5.0
 
 [connection signal="item_selected" from="SettingsContainer/BrowserRow/BrowserOption" to="." method="_on_resolution_option_item_selected"]
 [connection signal="pressed" from="SettingsContainer/BrowserRow/BrowserOption" to="." method="_on_browser_option_pressed"]
