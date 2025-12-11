@@ -1,11 +1,11 @@
-[gd_scene load_steps=12 format=3 uid="uid://1stnqodxk3fa"]
+[gd_scene load_steps=12 format=3 uid="uid://b32bhnphld1jv"]
 
 [ext_resource type="Shader" uid="uid://d3ccmggvy2v2h" path="res://Assets/Custom Themes/Shaders/blur.gdshader" id="1_7ar52"]
 [ext_resource type="Script" uid="uid://cud368n0i6bmx" path="res://Assets/Scripts/YoutubeSelectionScript.gd" id="1_oqhqr"]
 [ext_resource type="Texture2D" uid="uid://dyai6p0xn0gyq" path="res://Assets/Textures/Backgrounds/White Background.png" id="2_j3qb6"]
 [ext_resource type="Texture2D" uid="uid://cyx54jgix6nof" path="res://Assets/Textures/Backgrounds/ErrorMessageBackground.png" id="3_b3144"]
 [ext_resource type="Theme" uid="uid://ow000d0w1g6a" path="res://Assets/Custom Themes/SettingsTheme.tres" id="4_la417"]
-[ext_resource type="AudioStream" uid="uid://bv63xjbpfg0xp" path="res://Assets/Sounds/BlipSound.wav" id="5_la417"]
+[ext_resource type="AudioStream" uid="uid://ch73ixjbo5k4l" path="res://Assets/Sounds/BlipSound.wav" id="5_la417"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_b3144"]
 shader = ExtResource("1_7ar52")

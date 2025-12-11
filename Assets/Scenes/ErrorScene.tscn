@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://dtffkgleva4vo"]
+[gd_scene load_steps=12 format=3 uid="uid://cb72q736vpc1y"]
 
 [ext_resource type="Theme" uid="uid://ow000d0w1g6a" path="res://Assets/Custom Themes/SettingsTheme.tres" id="1_4c4dx"]
 [ext_resource type="Texture2D" uid="uid://cyx54jgix6nof" path="res://Assets/Textures/Backgrounds/ErrorMessageBackground.png" id="1_jhql4"]
