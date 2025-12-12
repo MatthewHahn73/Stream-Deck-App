@@ -1,0 +1,28 @@
+Bugs
+	-Sound effects play in the background if they are enabled and the application is not closed upon launching a streaming service
+	-Website occasionally doesn't launch properly if multiple different sites accessed in a short period of time
+	-Freetube is not scaling properly on 1080p
+	-Chrome based browsers (Chrome, Opera) don't scale properly in 1080p
+		-Likely something to do with the flatpak scaling options in the config
+	-Youtube/Error scenes aren't having their visible flag saved properly and have to be manually hidden on app launch
+		-Seems to be a godot issue. Persists on compiled builds
+			-Animation related? 
+	
+TODO
+	-Additional options
+		-CrunchyRoll 
+		-Tubi
+		-Peacock
+		-Twitch
+	-Update artwork
+		-Need to improve the steam artwork. Specifically the Hero banner
+			-Can replace the Logo with a titlecard in the banner
+		-Grid/Grid Long might not have the title centered properly 
+		-Add the artwork to the repo 
+	-Installation script
+		-One click installation script to create the steam shortcut and populate its artwork
+	-Update the github page
+		-Gif(s) of functionality
+		-Feature list
+		-Controller config
+			-Either copy or reference to search in steam 
