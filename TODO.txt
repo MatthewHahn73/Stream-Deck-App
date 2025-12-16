@@ -1,7 +1,8 @@
 Bugs
+	-When updating in Game Mode, sometimes shows ark GUI which breaks the update
 	-Website occasionally doesn't launch properly if multiple different sites accessed in a short period of time
 	-Freetube is not scaling properly in 1080p 
-		-Something to do with the settings being saved if first booted in a lower resolution
+		-Drop downs also don't work properly in the settings
 		-Trying to force the issue with steam settings doesn't work
 	
 TODO
@@ -12,9 +13,8 @@ TODO
 		-Twitch
 	-Update artwork
 		-Need to improve the steam artwork. Specifically the Hero banner
-			-Can replace the Logo with a titlecard in the banner
-		-Grid/Grid Long might not have the title centered properly 
-		-Add the artwork to the repo 
+			-Replacing the logo doesn't work. Need to remove the title in the banner
+			-Might also want to add some outlines to the text to allow for better clarity
 	-Installation script
 		-One click installation script to create the steam shortcut and populate its artwork
 	-Update the github page
