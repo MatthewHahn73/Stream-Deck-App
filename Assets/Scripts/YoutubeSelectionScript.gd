@@ -22,7 +22,7 @@ func _on_back_button_pressed() -> void:
 	YoutubeAnimations.play("Load Out")
 
 func _on_any_button_focus_gained() -> void:
-	if DefaultScript.MenuSettings["MenuSounds"]:
+	if DefaultScript.MenuSettings["MenuSounds"] && DefaultScript.EnableUISoundsFocus:
 		DefaultScript.MenuBlips.play()
 		
 func _on_mouse_entered_focus_toggle(Type: String, Focus: bool) -> void:

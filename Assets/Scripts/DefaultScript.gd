@@ -33,12 +33,12 @@ var VersionFileLocation = ExecutableDirectory + "Assets/JSON/Version.json"
 var UpdateFile = ExecutableDirectory + "LatestBuild.zip"
 
 #Instance Variables
-var SettingsToggle = true
 var StreamingLinks = {}
 var CMDArguments = {}
 var MenuSettings = {}
 var DownloadLink = ""
 var NewReleaseVersion = ""
+var EnableUISoundsFocus = true
 
 #Custom Functions	
 func DetermineDebugging() -> String:	#Determines if the project is compiled and sets paths depending on whether it is or not for debugging purposes
@@ -112,7 +112,6 @@ func LoadVersion() -> void: #Loads the application version and sets it as the su
 		ShowErrorMessage("IO Error", "Unable to open '" + VersionFileLocation + "'")
 
 func ToggleMainButtonsDisabled(Toggle: bool) -> void: 	#Toggles the website links, settings, and power buttons
-	SettingsToggle = !Toggle
 	for StreamingButton in ServicesBox.get_children():
 		StreamingButton.disabled = Toggle
 		StreamingButton.focus_mode = FOCUS_NONE if Toggle else FOCUS_ALL
@@ -175,7 +174,7 @@ func FetchLatestReleaseCompleted(Result: int, ResponseCode: int, _Headers: Packe
 		ErrorMenu.ToggleErrorMessageAcknowledge(false)
 
 func ShowSettingsMenu() -> void: 	#Toggles the settings menu 
-	ToggleMainButtonsDisabled(SettingsToggle) 
+	ToggleMainButtonsDisabled(true) 
 	if PreviewImage.visible:
 		LogoAnimations.play("Preview Fade Out")		
 	SettingsAnimations.play("Settings Load")
@@ -255,19 +254,25 @@ func _ready() -> void:
 	LoadStreamingLinks()
 	MoveUserFilesIfApplicable()
 	SettingsMenu.LoadSettings()
-	if CMDArguments.has("AutoLaunch") && CMDArguments["AutoLaunch"] != null:			#If a command line argument for autolaunch was loaded, load that service 
-		_on_any_service_button_pressed(CMDArguments["AutoLaunch"])
-	if Input.get_connected_joypads():													#Controller is connected
-		DefaultButton.grab_focus()														#Grab focus on the first available option
 	FetchLatestGithubReleaseRequest.request_completed.connect(FetchLatestReleaseCompleted) 
 	DownloadLatestGithubReleaseRequest.request_completed.connect(DownloadLatestReleaseComplete)
-	YoutubeMenu.visible = false
-	ErrorMenu.visible = false
+	get_viewport().focus_entered.connect(_on_window_focus_in)
+	get_viewport().focus_exited.connect(_on_window_focus_out)
+	if Input.get_connected_joypads():													#Controller is connected
+		DefaultButton.grab_focus()														#Grab focus on the first available option
+	if CMDArguments.has("AutoLaunch") && CMDArguments["AutoLaunch"] != null:			#If a command line argument for autolaunch was loaded, load that service 
+		_on_any_service_button_pressed(CMDArguments["AutoLaunch"])
+
+func _on_window_focus_in() -> void:
+	EnableUISoundsFocus = true
+		
+func _on_window_focus_out() -> void:
+	EnableUISoundsFocus = false
 			
 func _on_button_focus_gained(ServiceType: String) -> void:
 	var ServiceButtonEntered = ReturnButtonFromType(ServiceType)
 	if ServiceButtonEntered != null && !ServiceButtonEntered.disabled:
-		if MenuSettings["MenuSounds"]:
+		if MenuSettings["MenuSounds"] && EnableUISoundsFocus:
 			MenuBlips.play()
 		PreviewImage.texture = BackgroundImages.get_resource(ServiceType) 
 		LogoAnimations.play("Preview Fade In")		
@@ -278,7 +283,7 @@ func _on_button_focus_lost(ServiceType: String) -> void:
 		LogoAnimations.play("Preview Fade Out")		
 		
 func _on_other_buttons_focus_gained() -> void:
-	if MenuSettings["MenuSounds"]:
+	if MenuSettings["MenuSounds"] && EnableUISoundsFocus:
 		MenuBlips.play()
 				
 func _on_mouse_entered_focus_toggle(ServiceType: String, Focus: bool) -> void:
@@ -297,7 +302,7 @@ func _on_any_service_button_pressed(ServiceType: String) -> void:
 
 func _on_settings_pressed() -> void:
 	ShowSettingsMenu()
-	SettingsMenu.ToggleAllElementsFocusDisabled(SettingsToggle)
+	SettingsMenu.ToggleAllElementsFocusDisabled(false)
 	SettingsMenu.ToggleSaveButton()
 	if Input.get_connected_joypads():	#Controller is connected
 		SettingsMenu.BackButton.grab_focus()

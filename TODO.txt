@@ -1,12 +1,8 @@
 Bugs
-	-Sound effects play in the background if they are enabled and the application is not closed upon launching a streaming service
 	-Website occasionally doesn't launch properly if multiple different sites accessed in a short period of time
-	-Freetube is not scaling properly on 1080p
-	-Chrome based browsers (Chrome, Opera) don't scale properly in 1080p
-		-Likely something to do with the flatpak scaling options in the config
-	-Youtube/Error scenes aren't having their visible flag saved properly and have to be manually hidden on app launch
-		-Seems to be a godot issue. Persists on compiled builds
-			-Animation related? 
+	-Freetube is not scaling properly in 1080p 
+		-Something to do with the settings being saved if first booted in a lower resolution
+		-Trying to force the issue with steam settings doesn't work
 	
 TODO
 	-Additional options

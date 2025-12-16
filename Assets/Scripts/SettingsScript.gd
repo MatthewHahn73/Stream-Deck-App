@@ -9,8 +9,10 @@ extends Control
 @onready var SettingsMenu: Control = $"."
 @onready var DefaultScript: Control = get_parent().get_parent() 	#DefaultScene Node
 
-#General Variables
+#Static Variables
 var BrowserTableLocation = "res://Assets/JSON/BrowserFlatpaks.json"
+
+#Instance Variables
 var BrowserTable = {}
 
 #Custom Functions
@@ -111,7 +113,7 @@ func _ready() -> void:
 func _on_button_focus_gained(ButtonType: String) -> void:
 	var ButtonEntered = ReturnButtonFromType(ButtonType)
 	if ButtonEntered != null && !ButtonEntered.disabled:
-		if DefaultScript.MenuSettings["MenuSounds"]:
+		if DefaultScript.MenuSettings["MenuSounds"] && DefaultScript.EnableUISoundsFocus:
 			DefaultScript.MenuBlips.play()
 
 func _on_mouse_entered_focus_toggle(ServiceType: String, Focus: bool) -> void:
@@ -123,13 +125,9 @@ func _on_mouse_entered_focus_toggle(ServiceType: String, Focus: bool) -> void:
 			ServiceButtonEntered.release_focus()
 						
 func _on_resolution_option_item_selected(_index: int) -> void:
-	if DefaultScript.MenuSettings["MenuSounds"]:
+	if DefaultScript.MenuSettings["MenuSounds"] && DefaultScript.EnableUISoundsFocus:
 		DefaultScript.MenuClicks.play()
 	ToggleSaveButton()
-
-func _on_browser_option_pressed() -> void:
-	if DefaultScript.MenuSettings["MenuSounds"]:
-		DefaultScript.MenuClicks.play()
 			
 func _on_settings_save_button_pressed() -> void:
 	SaveSettings()
@@ -138,8 +136,8 @@ func _on_settings_save_button_pressed() -> void:
 	BackButton.grab_focus()
 	
 func _on_back_button_pressed() -> void:
-	DefaultScript.ToggleMainButtonsDisabled(DefaultScript.SettingsToggle) 
-	ToggleAllElementsFocusDisabled(DefaultScript.SettingsToggle)
+	DefaultScript.ToggleMainButtonsDisabled(false) 
+	ToggleAllElementsFocusDisabled(false)
 	DefaultScript.SettingsAnimations.play("Settings Load Out")
 	if Input.get_connected_joypads():	#Controller is connected
 		DefaultScript.SettingButton.grab_focus()

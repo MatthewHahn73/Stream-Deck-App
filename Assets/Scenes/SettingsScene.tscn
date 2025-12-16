@@ -131,7 +131,6 @@ theme = ExtResource("3_m1o7v")
 text = "Save"
 
 [connection signal="item_selected" from="SettingsContainer/BrowserRow/BrowserOption" to="." method="_on_resolution_option_item_selected"]
-[connection signal="pressed" from="SettingsContainer/BrowserRow/BrowserOption" to="." method="_on_browser_option_pressed"]
 [connection signal="mouse_entered" from="SettingsContainer/MenuSoundsRow/CheckboxContainer/MenuSoundsButton" to="." method="_on_mouse_entered_focus_toggle" binds= ["MenuSounds", true]]
 [connection signal="mouse_exited" from="SettingsContainer/MenuSoundsRow/CheckboxContainer/MenuSoundsButton" to="." method="_on_mouse_entered_focus_toggle" binds= ["MenuSounds", false]]
 [connection signal="pressed" from="SettingsContainer/MenuSoundsRow/CheckboxContainer/MenuSoundsButton" to="." method="_on_resolution_option_item_selected" binds= [0]]
