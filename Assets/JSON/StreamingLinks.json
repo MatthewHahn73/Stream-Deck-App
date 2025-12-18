@@ -4,12 +4,10 @@
 		"PrimeVideo" : "https://www.amazon.com/video", 
 		"Netflix" : "https://www.netflix.com/", 
 		"HBOMax" : "https://www.max.com/",
-		"Hulu" : "https://www.hulu.com/streaming",
 		"AppleTV" : "https://tv.apple.com/", 
 		"Disney" : "https://www.disneyplus.com/", 
-		"Paramount" : "https://www.paramountplus.com/"
-	}, 
-	"Flatpaks" : {
-		"Freetube" : "io.freetubeapp.FreeTube"
-	}
+		"Paramount" : "https://www.paramountplus.com/",
+		"Tubi" : "https://tubitv.com/", 
+		"PeacockTV" : "https://www.peacocktv.com/"
+	} 
 }

@@ -1,16 +1,9 @@
 Bugs
-	-When updating in Game Mode, sometimes shows ark GUI which breaks the update
 	-Website occasionally doesn't launch properly if multiple different sites accessed in a short period of time
-	-Freetube is not scaling properly in 1080p 
-		-Drop downs also don't work properly in the settings
-		-Trying to force the issue with steam settings doesn't work
 	
 TODO
 	-Additional options
 		-CrunchyRoll 
-		-Tubi
-		-Peacock
-		-Twitch
 	-Update artwork
 		-Need to improve the steam artwork. Specifically the Hero banner
 			-Replacing the logo doesn't work. Need to remove the title in the banner

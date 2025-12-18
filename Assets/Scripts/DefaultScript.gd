@@ -2,7 +2,6 @@ extends Control
 
 #Node Variables
 @onready var SettingsMenu: Control = $MainGUI/SettingsScene
-@onready var YoutubeMenu: Control = $YoutubeSelectionScene
 @onready var ErrorMenu: Control = $ErrorScene
 @onready var FetchLatestGithubReleaseRequest: HTTPRequest = $FetchLatestGithubRelease
 @onready var DownloadLatestGithubReleaseRequest: HTTPRequest = $DownloadLatestGithubRelease
@@ -94,9 +93,9 @@ func LoadBashScriptSettings() -> int:	#Loads the user and application defined se
 				else:
 					ShowErrorMessage("IO Error", "Unable to load the blueprint conf file at " + ConfBlueprintLocation)
 			else:
-				ShowErrorMessage("Program Error", "Unable to find selected flatpak " + BrowserFlatpakLink)
+				ShowErrorMessage("Flatpak Error", "Unable to find selected flatpak " + BrowserFlatpakLink)
 		else:
-			ShowErrorMessage("Browser Error", "Unable to find one of the following browsers (Flatpak): Firefox, Google Chrome, Librewolf, Microsoft Edge, Opera")
+			ShowErrorMessage("No Browser Error", "A browser must be selected from the drop down in the settings menu. If there are no options available in the drop down, then one needs to be installed.")
 	BlueprintFile.close()
 	return 1
 	
@@ -145,12 +144,8 @@ func DownloadLatestReleaseComplete(Result: int, ResponseCode: int, _Headers: Pac
 	if Result == FetchLatestGithubReleaseRequest.RESULT_SUCCESS && ResponseCode == 200: 
 		ShowErrorMessage("Info", "Installing update ...")	
 		var UpdateFileAbsolute = ProjectSettings.globalize_path(UpdateFile)
-		OS.execute("ark", ["-b", UpdateFileAbsolute])														#Use ark to unzip the contents of the download to a folder in the directory
-		var UnzippedAbsolutePath = ProjectSettings.globalize_path(ExecutableDirectory + "Streaming.Services.App/")
-		var ExecutableAbsolutePath = ProjectSettings.globalize_path(ExecutableDirectory)
-		CopyDirectory(UnzippedAbsolutePath, ExecutableAbsolutePath)
+		OS.execute("unzip", ["-q", UpdateFileAbsolute])														#Use unzip package to unzip contents to the current directory
 		OS.execute("rm", [UpdateFileAbsolute]) 																#Delete the zip file
-		OS.execute("rm", ["-r", UnzippedAbsolutePath])														#Delete the Unzipped directory
 		MoveUserFilesIfApplicable()
 		ShowErrorMessage("Info", "Update complete. Please restart the application")		
 	else:
@@ -190,13 +185,7 @@ func ShowErrorMessage(ErrorMessageType: String, ErrorMessageLabel: String) -> vo
 		ErrorMenu.ErrorAnimations.play("Load In")
 	else:
 		ErrorMenu.UpdateErrorMessage(ErrorMessageType, ErrorMessageLabel)
-	
-func ShowYoutubeSelection() -> void:	#Toggle function for the youtube selection pop up
-	ToggleMainButtonsDisabled(true)
-	if PreviewImage.visible:
-		LogoAnimations.play("Preview Fade Out")	
-	YoutubeMenu.YoutubeAnimations.play("Load In")
-	
+		
 func LoadWebBrowserApplication(ServiceType: String) -> void: 	#Loads a web browser and navigates to a given URL
 	if LoadBashScriptSettings() == 0:	#If script settings successfully loaded, launch the browser
 		FindAndKillAnyActiveSessions()
@@ -206,22 +195,7 @@ func LoadWebBrowserApplication(ServiceType: String) -> void: 	#Loads a web brows
 				_on_power_pressed()
 		else:
 			ShowErrorMessage("Program Error", "Unable to launch " + StreamingLinks["Web Links"][ServiceType])
-			
-func LoadOtherApplication(ApplicationType) -> void:	#Loads a given flatpak application
-	match ApplicationType:
-		"Freetube":
-			if SettingsMenu.FlatpakIsInstalled(StreamingLinks["Flatpaks"][ApplicationType]) == 0:
-				var ApplicationInstance = OS.create_process("flatpak", ["run", StreamingLinks["Flatpaks"][ApplicationType]])
-				if ApplicationInstance:
-					if MenuSettings["AutoClose"]:
-						_on_power_pressed()
-				else:
-					ShowErrorMessage("Program Error", "Unable to launch " + StreamingLinks["Flatpaks"][ApplicationType])
-			else:
-				ShowErrorMessage("Program Error", "Unable to find selected flatpak " + StreamingLinks["Flatpaks"][ApplicationType])
-		_:
-			pass
-		
+					
 func ReturnButtonFromType(Type: String) -> Button:	#Returns a UI button given a simple descriptor
 	match Type:
 		"AppleTV":
@@ -238,6 +212,10 @@ func ReturnButtonFromType(Type: String) -> Button:	#Returns a UI button given a 
 			return $MainGUI/OptionsBackground/OptionsBox/ServicesBox/Amazon
 		"Youtube":
 			return $MainGUI/OptionsBackground/OptionsBox/ServicesBox/Youtube
+		"PeacockTV":
+			return $MainGUI/OptionsBackground/OptionsBox/ServicesBox/Peacock
+		"Tubi":
+			return $MainGUI/OptionsBackground/OptionsBox/ServicesBox/Tubi
 		"Power":
 			return $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Power
 		"Update":
@@ -295,10 +273,7 @@ func _on_mouse_entered_focus_toggle(ServiceType: String, Focus: bool) -> void:
 			ServiceButtonEntered.release_focus()
 			
 func _on_any_service_button_pressed(ServiceType: String) -> void:
-	if ServiceType != "YoutubeSelection":
-		LoadWebBrowserApplication(ServiceType)
-	else:
-		ShowYoutubeSelection()
+	LoadWebBrowserApplication(ServiceType)
 
 func _on_settings_pressed() -> void:
 	ShowSettingsMenu()
@@ -317,6 +292,8 @@ func _on_update_pressed() -> void:
 			await DownloadLatestRelease()
 		elif NewReleaseVersion == AppVersion.text:	#Update version is the same, no update necessary
 			ShowErrorMessage("Info", "Application is up to date")
+		else:
+			ShowErrorMessage("Error", "Version is newer than latest release")
 		
 func _on_clock_updates_timeout() -> void:
 	UpdateClock()

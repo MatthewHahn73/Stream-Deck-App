@@ -18,15 +18,15 @@
 [ext_resource type="Theme" uid="uid://ow000d0w1g6a" path="res://Assets/Custom Themes/SettingsTheme.tres" id="13_xvm51"]
 [ext_resource type="PackedScene" uid="uid://cb72q736vpc1y" path="res://Assets/Scenes/ErrorScene.tscn" id="14_p1b5j"]
 [ext_resource type="Texture2D" uid="uid://bnberx0u0k7gg" path="res://Assets/Textures/Logo Backgrounds/AppleTV.png" id="15_mbpuf"]
-[ext_resource type="PackedScene" uid="uid://b32bhnphld1jv" path="res://Assets/Scenes/YoutubeSelectionScene.tscn" id="15_tp87p"]
 [ext_resource type="AudioStream" uid="uid://ch73ixjbo5k4l" path="res://Assets/Sounds/BlipSound.wav" id="16_8f2q7"]
 [ext_resource type="Texture2D" uid="uid://cmumda413s570" path="res://Assets/Textures/Logo Backgrounds/Disney.png" id="16_p1b5j"]
 [ext_resource type="Texture2D" uid="uid://cw7s3jhgxvfo6" path="res://Assets/Textures/Logo Backgrounds/HBOMax.png" id="17_tp87p"]
-[ext_resource type="Texture2D" uid="uid://bnv2otgcfo8r4" path="res://Assets/Textures/Logo Backgrounds/Hulu.png" id="18_2pvwk"]
 [ext_resource type="Texture2D" uid="uid://c7bwvbsohhs3p" path="res://Assets/Textures/Logo Backgrounds/Netflix.png" id="19_te0b7"]
 [ext_resource type="Texture2D" uid="uid://dcthcl2dvnwsd" path="res://Assets/Textures/Logo Backgrounds/Paramount.png" id="20_2qp0i"]
 [ext_resource type="Texture2D" uid="uid://dbgxjuxbc675h" path="res://Assets/Textures/Logo Backgrounds/PrimeVideo.png" id="21_rxauu"]
 [ext_resource type="Texture2D" uid="uid://d3lymu2sggbqj" path="res://Assets/Textures/Logo Backgrounds/Youtube.png" id="22_tj8bl"]
+[ext_resource type="Texture2D" uid="uid://c1t54aepf5trm" path="res://Assets/Textures/Logo Backgrounds/PeacockTV.png" id="24_tj8bl"]
+[ext_resource type="Texture2D" uid="uid://bq7o0jhfrgnjm" path="res://Assets/Textures/Logo Backgrounds/Tubi.png" id="26_cjqub"]
 [ext_resource type="AudioStream" uid="uid://dg2x6yq7k52cl" path="res://Assets/Sounds/Select.wav" id="28_rxauu"]
 
 [sub_resource type="Animation" id="Animation_rxauu"]
@@ -338,8 +338,8 @@ alignment = 1
 
 [node name="TopMargin" type="MarginContainer" parent="MainGUI/OptionsBackground/OptionsBox"]
 layout_mode = 2
-theme_override_constants/margin_top = 75
-theme_override_constants/margin_bottom = 200
+theme_override_constants/margin_top = 120
+theme_override_constants/margin_bottom = 80
 
 [node name="TitleBox" type="VBoxContainer" parent="MainGUI/OptionsBackground/OptionsBox/TopMargin"]
 layout_mode = 2
@@ -363,12 +363,12 @@ vertical_alignment = 1
 
 [node name="ServicesBox" type="VBoxContainer" parent="MainGUI/OptionsBackground/OptionsBox"]
 layout_mode = 2
-size_flags_vertical = 4
+size_flags_vertical = 3
 theme_override_constants/separation = 0
 alignment = 1
 
 [node name="Amazon" type="Button" parent="MainGUI/OptionsBackground/OptionsBox/ServicesBox"]
-custom_minimum_size = Vector2(400, 50)
+custom_minimum_size = Vector2(400, 45)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -376,7 +376,7 @@ theme = ExtResource("4_ww48f")
 text = "Amazon Prime"
 
 [node name="AppleTV" type="Button" parent="MainGUI/OptionsBackground/OptionsBox/ServicesBox"]
-custom_minimum_size = Vector2(400, 50)
+custom_minimum_size = Vector2(400, 45)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -384,7 +384,7 @@ theme = ExtResource("4_ww48f")
 text = "Apple TV"
 
 [node name="Disney" type="Button" parent="MainGUI/OptionsBackground/OptionsBox/ServicesBox"]
-custom_minimum_size = Vector2(400, 50)
+custom_minimum_size = Vector2(400, 45)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -392,7 +392,7 @@ theme = ExtResource("4_ww48f")
 text = "Disney+"
 
 [node name="HBOMax" type="Button" parent="MainGUI/OptionsBackground/OptionsBox/ServicesBox"]
-custom_minimum_size = Vector2(400, 50)
+custom_minimum_size = Vector2(400, 45)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -400,7 +400,7 @@ theme = ExtResource("4_ww48f")
 text = "HBO Max"
 
 [node name="Netflix" type="Button" parent="MainGUI/OptionsBackground/OptionsBox/ServicesBox"]
-custom_minimum_size = Vector2(400, 50)
+custom_minimum_size = Vector2(400, 45)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -408,15 +408,31 @@ theme = ExtResource("4_ww48f")
 text = "Netflix"
 
 [node name="Paramount" type="Button" parent="MainGUI/OptionsBackground/OptionsBox/ServicesBox"]
-custom_minimum_size = Vector2(400, 50)
+custom_minimum_size = Vector2(400, 45)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 theme = ExtResource("4_ww48f")
 text = "Paramount+"
 
+[node name="Peacock" type="Button" parent="MainGUI/OptionsBackground/OptionsBox/ServicesBox"]
+custom_minimum_size = Vector2(400, 45)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("4_ww48f")
+text = "Peacock TV"
+
+[node name="Tubi" type="Button" parent="MainGUI/OptionsBackground/OptionsBox/ServicesBox"]
+custom_minimum_size = Vector2(400, 45)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("4_ww48f")
+text = "Tubi"
+
 [node name="Youtube" type="Button" parent="MainGUI/OptionsBackground/OptionsBox/ServicesBox"]
-custom_minimum_size = Vector2(400, 50)
+custom_minimum_size = Vector2(400, 45)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -425,8 +441,8 @@ text = "Youtube"
 
 [node name="BottomMargin" type="MarginContainer" parent="MainGUI/OptionsBackground/OptionsBox"]
 layout_mode = 2
-theme_override_constants/margin_top = 200
-theme_override_constants/margin_bottom = 75
+theme_override_constants/margin_top = 80
+theme_override_constants/margin_bottom = 120
 
 [node name="ConfigBox" type="HBoxContainer" parent="MainGUI/OptionsBackground/OptionsBox/BottomMargin"]
 custom_minimum_size = Vector2(0, 50)
@@ -484,9 +500,6 @@ offset_left = -708.0
 offset_right = 704.0
 grow_horizontal = 0
 
-[node name="YoutubeSelectionScene" parent="." instance=ExtResource("15_tp87p")]
-layout_mode = 1
-
 [node name="ErrorScene" parent="." instance=ExtResource("14_p1b5j")]
 layout_mode = 1
 
@@ -518,7 +531,7 @@ wait_time = 0.1
 autostart = true
 
 [node name="PreloadedImages" type="ResourcePreloader" parent="."]
-resources = [PackedStringArray("AppleTV", "Disney", "HBOMax", "Hulu", "Netflix", "Paramount", "PrimeVideo", "Youtube"), [ExtResource("15_mbpuf"), ExtResource("16_p1b5j"), ExtResource("17_tp87p"), ExtResource("18_2pvwk"), ExtResource("19_te0b7"), ExtResource("20_2qp0i"), ExtResource("21_rxauu"), ExtResource("22_tj8bl")]]
+resources = [PackedStringArray("AppleTV", "Disney", "HBOMax", "Netflix", "Paramount", "PeacockTV", "PrimeVideo", "Tubi", "Youtube"), [ExtResource("15_mbpuf"), ExtResource("16_p1b5j"), ExtResource("17_tp87p"), ExtResource("19_te0b7"), ExtResource("20_2qp0i"), ExtResource("24_tj8bl"), ExtResource("21_rxauu"), ExtResource("26_cjqub"), ExtResource("22_tj8bl")]]
 
 [node name="MenuSounds" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("16_8f2q7")
@@ -558,6 +571,16 @@ volume_db = -5.0
 [connection signal="mouse_entered" from="MainGUI/OptionsBackground/OptionsBox/ServicesBox/Paramount" to="." method="_on_mouse_entered_focus_toggle" binds= ["Paramount", true]]
 [connection signal="mouse_exited" from="MainGUI/OptionsBackground/OptionsBox/ServicesBox/Paramount" to="." method="_on_mouse_entered_focus_toggle" binds= ["Paramount", false]]
 [connection signal="pressed" from="MainGUI/OptionsBackground/OptionsBox/ServicesBox/Paramount" to="." method="_on_any_service_button_pressed" binds= ["Paramount"]]
+[connection signal="focus_entered" from="MainGUI/OptionsBackground/OptionsBox/ServicesBox/Peacock" to="." method="_on_button_focus_gained" binds= ["PeacockTV"]]
+[connection signal="focus_exited" from="MainGUI/OptionsBackground/OptionsBox/ServicesBox/Peacock" to="." method="_on_button_focus_lost" binds= ["PeacockTV"]]
+[connection signal="mouse_entered" from="MainGUI/OptionsBackground/OptionsBox/ServicesBox/Peacock" to="." method="_on_mouse_entered_focus_toggle" binds= ["PeacockTV", true]]
+[connection signal="mouse_exited" from="MainGUI/OptionsBackground/OptionsBox/ServicesBox/Peacock" to="." method="_on_mouse_entered_focus_toggle" binds= ["PeacockTV", false]]
+[connection signal="pressed" from="MainGUI/OptionsBackground/OptionsBox/ServicesBox/Peacock" to="." method="_on_any_service_button_pressed" binds= ["PeacockTV"]]
+[connection signal="focus_entered" from="MainGUI/OptionsBackground/OptionsBox/ServicesBox/Tubi" to="." method="_on_button_focus_gained" binds= ["Tubi"]]
+[connection signal="focus_exited" from="MainGUI/OptionsBackground/OptionsBox/ServicesBox/Tubi" to="." method="_on_button_focus_lost" binds= ["Tubi"]]
+[connection signal="mouse_entered" from="MainGUI/OptionsBackground/OptionsBox/ServicesBox/Tubi" to="." method="_on_mouse_entered_focus_toggle" binds= ["Tubi", true]]
+[connection signal="mouse_exited" from="MainGUI/OptionsBackground/OptionsBox/ServicesBox/Tubi" to="." method="_on_mouse_entered_focus_toggle" binds= ["Tubi", false]]
+[connection signal="pressed" from="MainGUI/OptionsBackground/OptionsBox/ServicesBox/Tubi" to="." method="_on_any_service_button_pressed" binds= ["Tubi"]]
 [connection signal="focus_entered" from="MainGUI/OptionsBackground/OptionsBox/ServicesBox/Youtube" to="." method="_on_button_focus_gained" binds= ["Youtube"]]
 [connection signal="focus_exited" from="MainGUI/OptionsBackground/OptionsBox/ServicesBox/Youtube" to="." method="_on_button_focus_lost" binds= ["Youtube"]]
 [connection signal="mouse_entered" from="MainGUI/OptionsBackground/OptionsBox/ServicesBox/Youtube" to="." method="_on_mouse_entered_focus_toggle" binds= ["Youtube", true]]
