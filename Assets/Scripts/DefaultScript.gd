@@ -140,7 +140,7 @@ func DownloadLatestRelease() -> void:	#Sets the download file/location and makes
 	DownloadLatestGithubReleaseRequest.request(DownloadLink)
 	await DownloadLatestGithubReleaseRequest.request_completed
 	
-func DownloadLatestReleaseComplete(Result: int, ResponseCode: int, _Headers: PackedStringArray, _Body: PackedByteArray) -> void:
+func DownloadLatestReleaseCompleted(Result: int, ResponseCode: int, _Headers: PackedStringArray, _Body: PackedByteArray) -> void:
 	if Result == FetchLatestGithubReleaseRequest.RESULT_SUCCESS && ResponseCode == 200: 
 		ShowErrorMessage("Info", "Installing update ...")	
 		var UpdateFileAbsolute = ProjectSettings.globalize_path(UpdateFile)
@@ -233,7 +233,7 @@ func _ready() -> void:
 	MoveUserFilesIfApplicable()
 	SettingsMenu.LoadSettings()
 	FetchLatestGithubReleaseRequest.request_completed.connect(FetchLatestReleaseCompleted) 
-	DownloadLatestGithubReleaseRequest.request_completed.connect(DownloadLatestReleaseComplete)
+	DownloadLatestGithubReleaseRequest.request_completed.connect(DownloadLatestReleaseCompleted)
 	get_viewport().focus_entered.connect(_on_window_focus_in)
 	get_viewport().focus_exited.connect(_on_window_focus_out)
 	if Input.get_connected_joypads():													#Controller is connected

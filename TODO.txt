@@ -4,10 +4,6 @@ Bugs
 TODO
 	-Additional options
 		-CrunchyRoll 
-	-Update artwork
-		-Need to improve the steam artwork. Specifically the Hero banner
-			-Replacing the logo doesn't work. Need to remove the title in the banner
-			-Might also want to add some outlines to the text to allow for better clarity
 	-Installation script
 		-One click installation script to create the steam shortcut and populate its artwork
 	-Update the github page
