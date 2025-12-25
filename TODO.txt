@@ -2,13 +2,6 @@ Bugs
 	-Website rarely doesn't launch properly if multiple different sites accessed in a short period of time
 	
 TODO
-	-Installation script
-		-One click installation script to create the steam shortcut and populate its artwork
-		-Script generates the non-steam shortcut but doesn't properly generate a usable AppID
-			-Everytime steam boots it generates a different one, seperate of the one in shortcuts.vdf
-				-This prevents the artwork from being able to be set properly
-				-This also means that even if the user was to set the artwork manually, it wouldn't load, since the ID wouldve been regenerated after a different boot
-				-Most other automation scripts use existing game IDs. Need to look into how SteamGridDB generates its AppIDs since it can still populate artwork for games not available on steam
 	-Additional options
 		-CrunchyRoll 
 	-Update the github page
