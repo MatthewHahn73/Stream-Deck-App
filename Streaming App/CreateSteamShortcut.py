@@ -15,6 +15,7 @@ import Modules.VDF as vdf
 
 USER = os.getlogin()
 SCRIPTDIRECTORY = os.getcwd() + "/"
+SCRIPTDIRECTORYFOLDERNAME = os.path.basename(os.getcwd())
 STREAMINGAPPLOCATION = f"/home/{USER}/Streaming/"
 STEAMUSERDATA = f"/home/{USER}/.steam/steam/userdata/"
 PATHTOUSERCONFIGGRIDS = STEAMUSERDATA + os.listdir(STEAMUSERDATA)[0] + "/config/grid/"
@@ -41,8 +42,8 @@ if __name__ == "__main__":
 
     os.makedirs(f"/home/{USER}/Streaming/")
     os.system(f"cp -a '{SCRIPTDIRECTORY}' '{STREAMINGAPPLOCATION}'")
-    os.system(f"rm -r '{STREAMINGAPPLOCATION}Streaming App/Modules/'")                                                                          #Delete the installation folders that aren't needed
-    os.system(f"rm '{STREAMINGAPPLOCATION}Streaming App/CreateSteamShortcut.py' '{STREAMINGAPPLOCATION}Streaming App/AutoInstall.sh'")          #Delete the installation files that aren't needed
+    os.system(f"rm -r '{STREAMINGAPPLOCATION}{SCRIPTDIRECTORYFOLDERNAME}/Modules/'")
+    os.system(f"rm '{STREAMINGAPPLOCATION}{SCRIPTDIRECTORYFOLDERNAME}/CreateSteamShortcut.py' '{STREAMINGAPPLOCATION}{SCRIPTDIRECTORYFOLDERNAME}/AutoInstall.sh'")
 
     print(f"Appending new shortcut to '{PATHTOSTEAMSHORTCUTSFILE}' ...")
     if not os.path.exists(PATHTOSTEAMSHORTCUTSFILE):
@@ -52,7 +53,7 @@ if __name__ == "__main__":
 
     ShortcutsDict = vdf.binary_load(open(PATHTOSTEAMSHORTCUTSFILE, "rb"))
     CurrentIteration = len(ShortcutsDict["shortcuts"])
-    PathToDirectory = f"/home/{USER}/Streaming/Streaming App/"
+    PathToDirectory = f"/home/{USER}/Streaming/{SCRIPTDIRECTORYFOLDERNAME}/"
     PathToScript = f"{PathToDirectory}Streaming Services App.x86_64"
     AppName = "Stream Deck"
     ExecutablePathReadable = '"' + PathToScript + '"'
