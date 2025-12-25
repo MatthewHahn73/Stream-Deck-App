@@ -23,9 +23,10 @@ extends Control
 #Static Variables
 var GithubLink = "https://api.github.com/repos/MatthewHahn73/Stream-Deck-App/releases/latest"
 var BuildType = DetermineDebugging()
-var ConfBlueprintLocation = BuildType + "://Streaming App/Streaming/Config/StreamingBlueprint.conf"
-var ScriptSettingsLocation = BuildType + "://Streaming App/Streaming/Config/Streaming.conf"
-var SettingsLocation = BuildType + "://Streaming App/Streaming/Config/Settings.json"
+var ProjectSubFolder = "Streaming App" if BuildType == "res" else ""
+var ConfBlueprintLocation = BuildType + "://" + ProjectSubFolder + "/Streaming/Config/StreamingBlueprint.conf"
+var ScriptSettingsLocation = BuildType + "://" + ProjectSubFolder + "/Streaming/Config/Streaming.conf"
+var SettingsLocation = BuildType + "://" + ProjectSubFolder + "/Streaming/Config/Settings.json"
 var ExecutableDirectory = "res://"
 var StreamingLinksLocation = ExecutableDirectory + "Assets/JSON/StreamingLinks.json"
 var VersionFileLocation = ExecutableDirectory + "Assets/JSON/Version.json"
