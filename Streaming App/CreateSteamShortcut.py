@@ -14,7 +14,7 @@ import os, time, binascii
 import Modules.VDF as vdf
 
 USER = os.getlogin()
-MAINDIRECTORY = os.path.abspath(os.path.join(os.path.dirname(__file__), '..')) + "/Streaming App/"
+SCRIPTDIRECTORY = os.getcwd() + "/"
 STREAMINGAPPLOCATION = f"/home/{USER}/Streaming/"
 STEAMUSERDATA = f"/home/{USER}/.steam/steam/userdata/"
 PATHTOUSERCONFIGGRIDS = STEAMUSERDATA + os.listdir(STEAMUSERDATA)[0] + "/config/grid/"
@@ -38,8 +38,9 @@ def GenerateShortcutId(ExePath, AppName):
 if __name__ == "__main__":
     StartTime = time.time()
     print(f"Installing the app in '{STREAMINGAPPLOCATION}' ...")
+
     os.makedirs(f"/home/{USER}/Streaming/")
-    os.system(f"cp -a '{MAINDIRECTORY}' '{STREAMINGAPPLOCATION}'")
+    os.system(f"cp -a '{SCRIPTDIRECTORY}' '{STREAMINGAPPLOCATION}'")
     os.system(f"rm -r '{STREAMINGAPPLOCATION}Streaming App/Modules/'")                                                                          #Delete the installation folders that aren't needed
     os.system(f"rm '{STREAMINGAPPLOCATION}Streaming App/CreateSteamShortcut.py' '{STREAMINGAPPLOCATION}Streaming App/AutoInstall.sh'")          #Delete the installation files that aren't needed
 
@@ -87,7 +88,7 @@ if __name__ == "__main__":
         "SDStreamingLogo":   f"{ArtworkAppID}_logo.png",
     }
     for OldFileName, NewFileName in NewFileNames.items():
-        OldFileFullPath = f"{MAINDIRECTORY}Artwork/{OldFileName}.png"
+        OldFileFullPath = f"{SCRIPTDIRECTORY}Artwork/{OldFileName}.png"
         NewFileFullPath = PATHTOUSERCONFIGGRIDS + NewFileName
         print(f"Copying '{OldFileFullPath}' to '{NewFileFullPath }' ...")
         os.system(f"cp '{OldFileFullPath}' '{NewFileFullPath}'")
