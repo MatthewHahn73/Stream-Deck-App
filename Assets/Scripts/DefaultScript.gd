@@ -145,8 +145,9 @@ func DownloadLatestReleaseCompleted(Result: int, ResponseCode: int, _Headers: Pa
 	if Result == FetchLatestGithubReleaseRequest.RESULT_SUCCESS && ResponseCode == 200: 
 		ShowErrorMessage("Info", "Installing update ...")	
 		var UpdateFileAbsolute = ProjectSettings.globalize_path(UpdateFile)
-		OS.execute("unzip", ["-q", UpdateFileAbsolute])														#Use unzip package to unzip contents to the current directory
-		OS.execute("rm", [UpdateFileAbsolute]) 																#Delete the zip file
+		var ExtractionDirectory = ProjectSettings.globalize_path(ExecutableDirectory + ProjectSubFolder + "/")
+		OS.execute("unzip", ["-o", "-q", UpdateFileAbsolute, "-d", ExtractionDirectory])						#Use unzip package to unzip contents to the current directory
+		OS.execute("rm", [UpdateFileAbsolute]) 																	#Delete the zip file
 		MoveUserFilesIfApplicable()
 		ShowErrorMessage("Info", "Update complete. Please restart the application")		
 	else:
