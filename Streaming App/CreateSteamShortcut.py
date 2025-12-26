@@ -87,6 +87,7 @@ if __name__ == "__main__":
         "SDStreamingGridLong": f"{ArtworkAppID}.png",
         "SDStreamingHero":   f"{ArtworkAppID}_hero.png",
         "SDStreamingLogo":   f"{ArtworkAppID}_logo.png",
+        "SteamDeckIcon": f"{ArtworkAppID}_icon.png"
     }
     for OldFileName, NewFileName in NewFileNames.items():
         OldFileFullPath = f"{SCRIPTDIRECTORY}Artwork/{OldFileName}.png"
@@ -94,4 +95,7 @@ if __name__ == "__main__":
         print(f"Copying '{OldFileFullPath}' to '{NewFileFullPath }' ...")
         os.system(f"cp '{OldFileFullPath}' '{NewFileFullPath}'")
 
-    print(f"Stream Deck has been successfully installed\nScript runtime: {round(time.time()-StartTime, 2)} second(s)")
+    print(f"Script runtime: {round(time.time()-StartTime, 2)} second(s)")
+    print("*"*50 + "\nStream Deck has been successfully installed!\n" + "*"*50)
+
+
