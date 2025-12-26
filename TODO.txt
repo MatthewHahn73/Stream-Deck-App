@@ -1,7 +1,16 @@
 Bugs
-	-Website rarely doesn't launch properly if multiple different sites accessed in a short period of time
+	-Website rarely doesn't launch properly if multiple different streaming services accessed in a short period of time
+	-Settings don't save on updating application from the GUI
+		-Likely due to caching in /home/$USER/.local/share/godot/app_userdata/StreamDeck/
+		-Maybe something to do with the local Settings.json file?
+	-Upon updating, the install scripts and python modules folder persist in the application directory
+		-Need to delete these from the application
 	
 TODO
+	-Additional Testing
+		-Lots of potential issues with the update functionality
+			-Set up some test cases?
+		-Do some extra testing with the auto install script
 	-Additional options
 		-CrunchyRoll 
 	-Update the github page
