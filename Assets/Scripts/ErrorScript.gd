@@ -11,8 +11,6 @@ extends Control
 func UpdateErrorMessage(ErrorType: String, ErrorMessage: String) -> void:	#Setter function for the error message type and content
 	ErrorTypeLabel.text = ErrorType
 	ErrorMessageLabel.text = ErrorMessage
-	if Input.get_connected_joypads():	#Controller is connected
-		BackButton.grab_focus()
 	
 func ToggleErrorMessageAcknowledge(Toggle: bool) -> void:
 	BackButton.disabled = Toggle

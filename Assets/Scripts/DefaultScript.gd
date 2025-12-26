@@ -145,14 +145,15 @@ func DownloadLatestReleaseCompleted(Result: int, ResponseCode: int, _Headers: Pa
 	if Result == FetchLatestGithubReleaseRequest.RESULT_SUCCESS && ResponseCode == 200: 
 		ShowErrorMessage("Info", "Installing update ...")	
 		var UpdateFileAbsolute = ProjectSettings.globalize_path(UpdateFile)
-		var ExtractionDirectory = ProjectSettings.globalize_path(ExecutableDirectory + ProjectSubFolder + "/")
-		OS.execute("unzip", ["-o", "-q", UpdateFileAbsolute, "-d", ExtractionDirectory])						#Use unzip package to unzip contents to the current directory
+		OS.execute("unzip", ["-o", "-q", UpdateFileAbsolute])													#Use unzip package to unzip contents to the current directory
 		OS.execute("rm", [UpdateFileAbsolute]) 																	#Delete the zip file
 		MoveUserFilesIfApplicable()
 		ShowErrorMessage("Info", "Update complete. Please restart the application")		
 	else:
 		ShowErrorMessage("Error", "Update failed. Error code: " + str(ResponseCode))
 	ErrorMenu.ToggleErrorMessageAcknowledge(false)
+	if Input.get_connected_joypads():																			#Controller is connected
+		ErrorMenu.BackButton.grab_focus()
 
 func FetchLatestRelease() -> void:
 	FetchLatestGithubReleaseRequest.request(GithubLink)
@@ -169,6 +170,9 @@ func FetchLatestReleaseCompleted(Result: int, ResponseCode: int, _Headers: Packe
 	else:
 		ShowErrorMessage("Error", "Attempt to get latest update version failed. Error code: " + str(ResponseCode))
 		ErrorMenu.ToggleErrorMessageAcknowledge(false)
+		if Input.get_connected_joypads():																			#Controller is connected
+			ErrorMenu.BackButton.grab_focus()
+
 
 func ShowSettingsMenu() -> void: 	#Toggles the settings menu 
 	ToggleMainButtonsDisabled(true) 
