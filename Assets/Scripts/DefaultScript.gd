@@ -3,34 +3,36 @@ extends Control
 #Node Variables
 @onready var SettingsMenu: Control = $MainGUI/SettingsScene
 @onready var ErrorMenu: Control = $ErrorScene
-@onready var FetchLatestGithubReleaseRequest: HTTPRequest = $FetchLatestGithubRelease
-@onready var DownloadLatestGithubReleaseRequest: HTTPRequest = $DownloadLatestGithubRelease
 @onready var AppVersion: Label = $MainGUI/OptionsBackground/OptionsBox/TopMargin/TitleBox/AppVersion
 @onready var ClockLabel: Label = $ClockMarginContainer/ClockLabel
 @onready var ServicesBox: VBoxContainer = $MainGUI/OptionsBackground/OptionsBox/ServicesBox
 @onready var ConfigBox: HBoxContainer = $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox
-@onready var MenuBlips: AudioStreamPlayer = $MenuSounds
-@onready var MenuClicks: AudioStreamPlayer = $MenuClicks
-@onready var SettingsAnimations: AnimationPlayer = $SettingsAnimations
-@onready var LogoAnimations: AnimationPlayer = $LogoAnimations
 @onready var PreviewImage: TextureRect = $PreviewImage
-@onready var BackgroundImages: ResourcePreloader = $PreloadedImages
 @onready var DefaultButton: Button = $MainGUI/OptionsBackground/OptionsBox/ServicesBox/Amazon
 @onready var PowerButton: TextureButton = $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Power
 @onready var SettingButton: TextureButton = $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings
 @onready var UpdateButton: TextureButton = $MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/UpdateControl/Update
+@onready var BackgroundImages: ResourcePreloader = $PreloadedImages
+@onready var FetchLatestGithubReleaseRequest: HTTPRequest = $FetchLatestGithubRelease
+@onready var DownloadLatestGithubReleaseRequest: HTTPRequest = $DownloadLatestGithubRelease
+@onready var MenuBlips: AudioStreamPlayer = $MenuSounds
+@onready var MenuClicks: AudioStreamPlayer = $MenuClicks
+@onready var SettingsAnimations: AnimationPlayer = $SettingsAnimations
+@onready var LogoAnimations: AnimationPlayer = $LogoAnimations
+@onready var IconAnimations: AnimationPlayer = $IconAnimations
 
 #Static Variables
 var GithubLink = "https://api.github.com/repos/MatthewHahn73/Stream-Deck-App/releases/latest"
 var BuildType = DetermineDebugging()
-var ProjectSubFolder = "Streaming App" if BuildType == "res" else ""
-var ConfBlueprintLocation = BuildType + "://" + ProjectSubFolder + "/Streaming/Config/StreamingBlueprint.conf"
-var ScriptSettingsLocation = BuildType + "://" + ProjectSubFolder + "/Streaming/Config/Streaming.conf"
-var SettingsLocation = BuildType + "://" + ProjectSubFolder + "/Streaming/Config/Settings.json"
+var ProjectSubFolder = "Streaming App/" if BuildType == "res" else ""
+var ConfBlueprintLocation = BuildType + "://" + ProjectSubFolder + "Streaming/Config/StreamingBlueprint.conf"
+var ScriptSettingsLocation = BuildType + "://" + ProjectSubFolder + "Streaming/Config/Streaming.conf"
+var SettingsLocation = BuildType + "://" + ProjectSubFolder + "Streaming/Config/Settings.json"
 var ExecutableDirectory = "res://"
 var StreamingLinksLocation = ExecutableDirectory + "Assets/JSON/StreamingLinks.json"
 var VersionFileLocation = ExecutableDirectory + "Assets/JSON/Version.json"
-var UpdateFile = ExecutableDirectory + "LatestBuild.zip"
+var ExecutableLocation = (ProjectSettings.globalize_path(ExecutableDirectory + ProjectSubFolder) if BuildType == "res" else OS.get_executable_path().get_base_dir() + "/")
+var UpdateFile = ExecutableLocation + "LatestBuild.zip"
 
 #Instance Variables
 var StreamingLinks = {}
@@ -52,7 +54,7 @@ func MoveUserFilesIfApplicable() -> void: 	#Move the streaming folder to an acce
 		var UserFilesAbsolutePath = ProjectSettings.globalize_path(BuildType + "://Streaming/")
 		CopyDirectory(ExecutableAbsolutePath, UserFilesAbsolutePath)
 			
-func CopyDirectory(Source: String, Destination: String) -> void:	#Copies the 'Streaming' directory to the accessable user directory in .local
+func CopyDirectory(Source: String, Destination: String) -> void:	#Copies the contents of one directory to another
 	DirAccess.make_dir_recursive_absolute(Destination)
 	var SourceDir = DirAccess.open(Source)
 	for Directory in SourceDir.get_directories():
@@ -143,18 +145,18 @@ func DownloadLatestRelease() -> void:	#Sets the download file/location and makes
 	
 func DownloadLatestReleaseCompleted(Result: int, ResponseCode: int, _Headers: PackedStringArray, _Body: PackedByteArray) -> void:
 	if Result == FetchLatestGithubReleaseRequest.RESULT_SUCCESS && ResponseCode == 200: 
-		ShowErrorMessage("Info", "Installing update ...")	
-		var UpdateFileAbsolute = ProjectSettings.globalize_path(UpdateFile)
-		OS.execute("unzip", ["-o", "-q", UpdateFileAbsolute])													#Use unzip package to unzip contents to the current directory
-		OS.execute("rm", [UpdateFileAbsolute]) 																	#Delete the zip file
+		OS.execute("unzip", ["-o", "-q", UpdateFile, "-d", ExecutableLocation])							#Use unzip package to unzip contents to the current directory
+		OS.execute("rm", [UpdateFile]) 																	#Delete the zip file
+		OS.execute("rm", ["-r", ExecutableLocation + "Modules/"])										#Delete the first time installation scripts
+		OS.execute("rm", [ExecutableLocation + "/CreateSteamShortcut.py", ExecutableLocation + "/AutoInstall.sh"])
 		MoveUserFilesIfApplicable()
 		ShowErrorMessage("Info", "Update complete. Please restart the application")		
 	else:
 		ShowErrorMessage("Error", "Update failed. Error code: " + str(ResponseCode))
 	ErrorMenu.ToggleErrorMessageAcknowledge(false)
-	if Input.get_connected_joypads():																			#Controller is connected
+	if Input.get_connected_joypads():
 		ErrorMenu.BackButton.grab_focus()
-
+	
 func FetchLatestRelease() -> void:
 	FetchLatestGithubReleaseRequest.request(GithubLink)
 	await FetchLatestGithubReleaseRequest.request_completed
@@ -170,16 +172,16 @@ func FetchLatestReleaseCompleted(Result: int, ResponseCode: int, _Headers: Packe
 	else:
 		ShowErrorMessage("Error", "Attempt to get latest update version failed. Error code: " + str(ResponseCode))
 		ErrorMenu.ToggleErrorMessageAcknowledge(false)
-		if Input.get_connected_joypads():																			#Controller is connected
+		if Input.get_connected_joypads():	
 			ErrorMenu.BackButton.grab_focus()
-
-
+	IconAnimations.stop()
+	
 func ShowSettingsMenu() -> void: 	#Toggles the settings menu 
 	ToggleMainButtonsDisabled(true) 
 	if PreviewImage.visible:
 		LogoAnimations.play("Preview Fade Out")		
 	SettingsAnimations.play("Settings Load")
-
+	
 func ShowErrorMessage(ErrorMessageType: String, ErrorMessageLabel: String) -> void:							#Toggle function for the error message pop up
 	if ErrorMessageType != "Info":
 		print(ErrorMessageType + " - " + ErrorMessageLabel)													#Log errors to console
@@ -195,7 +197,8 @@ func ShowErrorMessage(ErrorMessageType: String, ErrorMessageLabel: String) -> vo
 func LoadWebBrowserApplication(ServiceType: String) -> void: 	#Loads a web browser and navigates to a given URL
 	if LoadBashScriptSettings() == 0:	#If script settings successfully loaded, launch the browser
 		FindAndKillAnyActiveSessions()
-		var BrowserInstance = OS.execute_with_pipe("bash", [ProjectSettings.globalize_path(BuildType + "://Streaming/LaunchBrowser.sh"), StreamingLinks["Web Links"][ServiceType]])
+		var LaunchScriptLocation = ProjectSettings.globalize_path(BuildType + "://" + ProjectSubFolder + "Streaming/LaunchBrowser.sh")
+		var BrowserInstance = OS.execute_with_pipe("bash", [LaunchScriptLocation, StreamingLinks["Web Links"][ServiceType]])
 		if BrowserInstance:
 			if MenuSettings["AutoClose"]:
 				_on_power_pressed()
@@ -278,6 +281,12 @@ func _on_mouse_entered_focus_toggle(ServiceType: String, Focus: bool) -> void:
 		else:
 			ServiceButtonEntered.release_focus()
 			
+func _on_settings_animations_animation_finished(AnimationName: StringName) -> void:
+	if AnimationName == "Settings Load Out":
+		ToggleMainButtonsDisabled(false) 
+		if Input.get_connected_joypads():	
+			SettingButton.grab_focus()
+						
 func _on_any_service_button_pressed(ServiceType: String) -> void:
 	LoadWebBrowserApplication(ServiceType)
 
@@ -285,12 +294,13 @@ func _on_settings_pressed() -> void:
 	ShowSettingsMenu()
 	SettingsMenu.ToggleAllElementsFocusDisabled(false)
 	SettingsMenu.ToggleSaveButton()
-	if Input.get_connected_joypads():	#Controller is connected
+	if Input.get_connected_joypads():
 		SettingsMenu.BackButton.grab_focus()
 
 func _on_update_pressed() -> void:
 	if !UpdateButton.disabled:
 		ToggleMainButtonsDisabled(true) 
+		IconAnimations.play("Update Logo Spin")
 		await FetchLatestRelease()
 		if NewReleaseVersion > AppVersion.text:		#Update found, download and install update
 			ShowErrorMessage("Info", "Update " + NewReleaseVersion + " found. Downloading ...")

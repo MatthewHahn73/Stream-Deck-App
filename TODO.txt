@@ -1,11 +1,13 @@
 Bugs
-	-Website rarely doesn't launch properly if multiple different streaming services accessed in a short period of time
-	-Settings don't save on updating application from the GUI
-		-Likely due to caching in /home/$USER/.local/share/godot/app_userdata/StreamDeck/
-		-Maybe something to do with the local Settings.json file?
-	-Upon updating, the install scripts and python modules folder persist in the application directory
-		-Need to delete these from the application
-	
+	Replicable
+		-Settings don't save on updating application from the GUI
+			-Likely due to the local settings file, not the one in /home/$USER/.local/share/godot/app_userdata/StreamDeck/
+		-Need to set the shell script for the auto-installation to execute as a program
+	Unreplicable
+		-Website rarely don't launch properly if multiple different streaming services are accessed in a short period of time one after the other
+			-Seems to only happen on firefox on the actual steam deck
+		-On very rare occassions, the application will launch in the wrong aspect ratio, resulting in black bars at the bottom of the screen
+
 TODO
 	-Additional Testing
 		-Lots of potential issues with the update functionality

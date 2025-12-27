@@ -1,4 +1,4 @@
-[gd_scene load_steps=39 format=3 uid="uid://ctl4d7gduq701"]
+[gd_scene load_steps=40 format=3 uid="uid://ctl4d7gduq701"]
 
 [ext_resource type="Texture2D" uid="uid://b24t74v8syjmc" path="res://Assets/Textures/Backgrounds/OptionsBackground.png" id="1_6kbbk"]
 [ext_resource type="Texture2D" uid="uid://d4f1gstadffqk" path="res://Assets/Textures/Icons/PowerIcon.png" id="1_wbwc7"]
@@ -24,7 +24,7 @@
 [ext_resource type="Texture2D" uid="uid://c7bwvbsohhs3p" path="res://Assets/Textures/Logo Backgrounds/Netflix.png" id="19_te0b7"]
 [ext_resource type="Texture2D" uid="uid://dcthcl2dvnwsd" path="res://Assets/Textures/Logo Backgrounds/Paramount.png" id="20_2qp0i"]
 [ext_resource type="Texture2D" uid="uid://dbgxjuxbc675h" path="res://Assets/Textures/Logo Backgrounds/PrimeVideo.png" id="21_rxauu"]
-[ext_resource type="Texture2D" uid="uid://d3lymu2sggbqj" path="res://Assets/Textures/Logo Backgrounds/Youtube.png" id="22_tj8bl"]
+[ext_resource type="Texture2D" uid="uid://cx0vwviogdakd" path="res://Assets/Textures/Logo Backgrounds/Youtube.png" id="22_tj8bl"]
 [ext_resource type="Texture2D" uid="uid://c1t54aepf5trm" path="res://Assets/Textures/Logo Backgrounds/PeacockTV.png" id="24_tj8bl"]
 [ext_resource type="Texture2D" uid="uid://bq7o0jhfrgnjm" path="res://Assets/Textures/Logo Backgrounds/Tubi.png" id="26_cjqub"]
 [ext_resource type="AudioStream" uid="uid://dg2x6yq7k52cl" path="res://Assets/Sounds/Select.wav" id="28_rxauu"]
@@ -43,6 +43,18 @@ tracks/0/keys = {
 "update": 1,
 "values": [false]
 }
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("MainGUI/SettingsScene:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
 
 [sub_resource type="Animation" id="Animation_mbpuf"]
 resource_name = "Settings Load"
@@ -51,11 +63,11 @@ tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/path = NodePath("MainGUI:position")
-tracks/0/interp = 1
+tracks/0/interp = 2
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.5),
-"transitions": PackedFloat32Array(0.5, 0.5),
+"transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Vector2(0, 0), Vector2(-708, 0)]
 }
@@ -63,7 +75,7 @@ tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
 tracks/1/path = NodePath("MainGUI/SettingsScene:modulate")
-tracks/1/interp = 1
+tracks/1/interp = 2
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.5),
@@ -83,6 +95,18 @@ tracks/2/keys = {
 "update": 1,
 "values": [true]
 }
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("MainGUI/SettingsScene:scale")
+tracks/3/interp = 2
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1e-05, 1e-05), Vector2(1, 1)]
+}
 
 [sub_resource type="Animation" id="Animation_tp87p"]
 resource_name = "Settings Load Out"
@@ -91,11 +115,11 @@ tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/path = NodePath("MainGUI:position")
-tracks/0/interp = 1
+tracks/0/interp = 2
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.5),
-"transitions": PackedFloat32Array(0.5, 0.5),
+"transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Vector2(-708, 0), Vector2(0, 0)]
 }
@@ -103,7 +127,7 @@ tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
 tracks/1/path = NodePath("MainGUI/SettingsScene:modulate")
-tracks/1/interp = 1
+tracks/1/interp = 2
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.5),
@@ -123,6 +147,18 @@ tracks/2/keys = {
 "update": 1,
 "values": [false]
 }
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("MainGUI/SettingsScene:scale")
+tracks/3/interp = 2
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1e-05, 1e-05)]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_tp87p"]
 _data = {
@@ -133,15 +169,15 @@ _data = {
 
 [sub_resource type="Animation" id="Animation_xvm51"]
 resource_name = "Preview Fade In"
-length = 0.3
+length = 0.2
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/path = NodePath("PreviewImage:modulate")
-tracks/0/interp = 1
+tracks/0/interp = 2
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.3),
+"times": PackedFloat32Array(0, 0.2),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
@@ -161,15 +197,15 @@ tracks/1/keys = {
 
 [sub_resource type="Animation" id="Animation_8f2q7"]
 resource_name = "Preview Fade Out"
-length = 0.3
+length = 0.2
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/path = NodePath("PreviewImage:modulate")
-tracks/0/interp = 1
+tracks/0/interp = 2
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.3),
+"times": PackedFloat32Array(0, 0.2),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
@@ -181,7 +217,7 @@ tracks/1/path = NodePath("PreviewImage:visible")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0.3),
+"times": PackedFloat32Array(0.2),
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [false]
@@ -221,12 +257,41 @@ _data = {
 &"RESET": SubResource("Animation_lv5e7")
 }
 
-[sub_resource type="Animation" id="Animation_tj8bl"]
-resource_name = "Error - Load In"
+[sub_resource type="Animation" id="Animation_cjqub"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/UpdateControl/Update:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_cjqub"]
+[sub_resource type="Animation" id="Animation_tj8bl"]
+resource_name = "Update Logo Spin"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/UpdateControl/Update:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, -6.283185307179586]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_lngjr"]
 _data = {
-&"Error - Load In": SubResource("Animation_tj8bl")
+&"RESET": SubResource("Animation_cjqub"),
+&"Update Logo Spin": SubResource("Animation_tj8bl")
 }
 
 [node name="DefaultScene" type="Control"]
@@ -303,7 +368,7 @@ theme_override_constants/margin_right = 20
 [node name="ClockLabel" type="Label" parent="ClockMarginContainer"]
 layout_mode = 2
 theme = ExtResource("13_xvm51")
-theme_override_font_sizes/font_size = 25
+theme_override_font_sizes/font_size = 27
 
 [node name="MainGUI" type="Control" parent="."]
 layout_mode = 1
@@ -320,8 +385,8 @@ anchors_preset = 13
 anchor_left = 0.5
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -250.0
-offset_right = 250.0
+offset_left = -252.0
+offset_right = 252.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("1_6kbbk")
@@ -473,6 +538,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+pivot_offset = Vector2(25, 25)
 texture_normal = ExtResource("10_2pvwk")
 texture_pressed = ExtResource("11_2qp0i")
 texture_disabled = ExtResource("11_2qp0i")
@@ -492,6 +558,7 @@ stretch_mode = 0
 
 [node name="SettingsScene" parent="MainGUI" instance=ExtResource("11_utu8n")]
 visible = false
+modulate = Color(1, 1, 1, 0)
 custom_minimum_size = Vector2(1412, 0)
 layout_mode = 1
 anchors_preset = 11
@@ -499,6 +566,7 @@ anchor_left = 1.0
 offset_left = -708.0
 offset_right = 704.0
 grow_horizontal = 0
+pivot_offset = Vector2(706, 540)
 
 [node name="ErrorScene" parent="." instance=ExtResource("14_p1b5j")]
 layout_mode = 1
@@ -507,15 +575,19 @@ layout_mode = 1
 libraries = {
 &"": SubResource("AnimationLibrary_tp87p")
 }
+playback_auto_capture_transition_type = 7
+playback_auto_capture_ease_type = 1
 
 [node name="LogoAnimations" type="AnimationPlayer" parent="."]
 libraries = {
 &"": SubResource("AnimationLibrary_8f2q7")
 }
+playback_auto_capture_transition_type = 7
+playback_auto_capture_ease_type = 1
 
 [node name="IconAnimations" type="AnimationPlayer" parent="."]
 libraries = {
-&"": SubResource("AnimationLibrary_cjqub")
+&"": SubResource("AnimationLibrary_lngjr")
 }
 
 [node name="FetchLatestGithubRelease" type="HTTPRequest" parent="."]
@@ -598,4 +670,5 @@ volume_db = -5.0
 [connection signal="mouse_entered" from="MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings" to="." method="_on_mouse_entered_focus_toggle" binds= ["Settings", true]]
 [connection signal="mouse_exited" from="MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings" to="." method="_on_mouse_entered_focus_toggle" binds= ["Settings", false]]
 [connection signal="pressed" from="MainGUI/OptionsBackground/OptionsBox/BottomMargin/ConfigBox/Settings" to="." method="_on_settings_pressed"]
+[connection signal="animation_finished" from="SettingsAnimations" to="." method="_on_settings_animations_animation_finished"]
 [connection signal="timeout" from="ClockUpdates" to="." method="_on_clock_updates_timeout"]

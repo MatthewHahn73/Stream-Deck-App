@@ -137,8 +137,5 @@ func _on_settings_save_button_pressed() -> void:
 		BackButton.grab_focus()
 	
 func _on_back_button_pressed() -> void:
-	DefaultScript.ToggleMainButtonsDisabled(false) 
 	ToggleAllElementsFocusDisabled(false)
 	DefaultScript.SettingsAnimations.play("Settings Load Out")
-	if Input.get_connected_joypads():	#Controller is connected
-		DefaultScript.SettingButton.grab_focus()

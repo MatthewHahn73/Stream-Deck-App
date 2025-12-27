@@ -1,7 +1,7 @@
 """
 AutoInstall.py
 
-Author: https://github.com/MatthewHahn73
+Author: Matthew Hahn
 
 Creates a steam shortcut for the 'Stream Deck' application and populates the shortcut with the right artwork
 
@@ -40,7 +40,8 @@ if __name__ == "__main__":
     StartTime = time.time()
     print(f"Installing the app in '{STREAMINGAPPLOCATION}' ...")
 
-    os.makedirs(f"/home/{USER}/Streaming/")
+    if not os.path.exists(STREAMINGAPPLOCATION):
+        os.makedirs(STREAMINGAPPLOCATION)
     os.system(f"cp -a '{SCRIPTDIRECTORY}' '{STREAMINGAPPLOCATION}'")
     os.system(f"rm -r '{STREAMINGAPPLOCATION}{SCRIPTDIRECTORYFOLDERNAME}/Modules/'")
     os.system(f"rm '{STREAMINGAPPLOCATION}{SCRIPTDIRECTORYFOLDERNAME}/CreateSteamShortcut.py' '{STREAMINGAPPLOCATION}{SCRIPTDIRECTORYFOLDERNAME}/AutoInstall.sh'")

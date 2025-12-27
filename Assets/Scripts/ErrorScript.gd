@@ -1,5 +1,6 @@
 extends Control
 
+#Node Variables
 @onready var DefaultScript: Control = get_parent() 	#DefaultScene Node
 @onready var ErrorScene: Control = $"."
 @onready var ErrorTypeLabel: Label = $ErrorBoxTexture/ErrorMessageMargins/ErrorMessageBox/ErrorMessageType
@@ -25,10 +26,11 @@ func _on_back_button_focus_gained() -> void:
 		DefaultScript.MenuBlips.play()
 		
 func _on_mouse_entered_focus_toggle(Focus: bool) -> void:
-	if Focus:
-		BackButton.grab_focus()
-	else:
-		BackButton.release_focus()
+	if BackButton != null && !BackButton.disabled:
+		if Focus:
+			BackButton.grab_focus()
+		else:
+			BackButton.release_focus()
 
 func _on_error_animations_animation_finished(AnimationName: StringName) -> void:
 	if AnimationName == "Load In":
@@ -36,5 +38,5 @@ func _on_error_animations_animation_finished(AnimationName: StringName) -> void:
 			BackButton.grab_focus()
 	if AnimationName == "Load Out":
 		DefaultScript.ToggleMainButtonsDisabled(false)
-		if Input.get_connected_joypads():	#Controller is connected
+		if Input.get_connected_joypads():
 			DefaultScript.DefaultButton.grab_focus()

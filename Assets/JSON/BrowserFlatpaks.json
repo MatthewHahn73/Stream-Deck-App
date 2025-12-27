@@ -18,5 +18,9 @@
 		"5": {
 			"Name" : "Opera", 
 			"Flatpak" : "com.opera.Opera"
+		}, 
+		"6": {
+			"Name": "Brave",
+			"Flatpak": "com.brave.Browser"
 		}
 	}
