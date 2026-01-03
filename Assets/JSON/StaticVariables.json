@@ -1,0 +1,41 @@
+	{
+		"Version" : "v1.1.3",
+		"Github Link" : "https://api.github.com/repos/MatthewHahn73/Stream-Deck-App/releases/latest",
+		"Web Links" : {
+			"Youtube" : "https://www.youtube.com/", 
+			"PrimeVideo" : "https://www.amazon.com/video", 
+			"Netflix" : "https://www.netflix.com/", 
+			"HBOMax" : "https://www.max.com/",
+			"AppleTV" : "https://tv.apple.com/", 
+			"Disney" : "https://www.disneyplus.com/", 
+			"Paramount" : "https://www.paramountplus.com/",
+			"Tubi" : "https://tubitv.com/", 
+			"PeacockTV" : "https://www.peacocktv.com/"
+		},
+		"Browser Flatpaks": {
+			"0": {
+				"Name" : "Firefox", 
+				"Flatpak" : "org.mozilla.firefox"
+			},
+			"1": {
+				"Name" : "Librewolf",  
+				"Flatpak" : "io.gitlab.librewolf-community"
+			},
+			"3": {
+				"Name" : "Edge", 
+				"Flatpak" : "com.microsoft.Edge"
+			},
+			"4": {
+				"Name" : "Chrome", 
+				"Flatpak" : "com.google.Chrome"
+			}, 
+			"5": {
+				"Name" : "Opera", 
+				"Flatpak" : "com.opera.Opera"
+			}, 
+			"6": {
+				"Name": "Brave",
+				"Flatpak": "com.brave.Browser"
+			}
+		}
+	}

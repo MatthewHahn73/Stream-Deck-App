@@ -22,15 +22,13 @@ extends Control
 @onready var IconAnimations: AnimationPlayer = $IconAnimations
 
 #Static Variables
-var GithubLink = "https://api.github.com/repos/MatthewHahn73/Stream-Deck-App/releases/latest"
 var BuildType = DetermineDebugging()
 var ProjectSubFolder = "Streaming App/" if BuildType == "res" else ""
 var ConfBlueprintLocation = BuildType + "://" + ProjectSubFolder + "Streaming/Config/StreamingBlueprint.conf"
 var ScriptSettingsLocation = BuildType + "://" + ProjectSubFolder + "Streaming/Config/Streaming.conf"
 var SettingsLocation = BuildType + "://" + ProjectSubFolder + "Streaming/Config/Settings.json"
 var ExecutableDirectory = "res://"
-var StreamingLinksLocation = ExecutableDirectory + "Assets/JSON/StreamingLinks.json"
-var VersionFileLocation = ExecutableDirectory + "Assets/JSON/Version.json"
+var StaticVariablesLocation = ExecutableDirectory + "Assets/JSON/StaticVariables.json"
 var ExecutableLocation = (ProjectSettings.globalize_path(ExecutableDirectory + ProjectSubFolder) if BuildType == "res" else OS.get_executable_path().get_base_dir() + "/")
 var UpdateFile = ExecutableLocation + "LatestBuild.zip"
 
@@ -38,6 +36,8 @@ var UpdateFile = ExecutableLocation + "LatestBuild.zip"
 var StreamingLinks = {}
 var CMDArguments = {}
 var MenuSettings = {}
+var BrowserTable = {}
+var GithubLink = ""
 var DownloadLink = ""
 var NewReleaseVersion = ""
 var EnableUISoundsFocus = true
@@ -68,18 +68,21 @@ func LoadArguments() -> void:	#Load arguments, if any
 			var KeyValue = Arg.split("=")
 			CMDArguments[KeyValue[0].trim_prefix("--")] = KeyValue[1]
 			
-func LoadStreamingLinks() -> void:	#Loads the website links and flatpak ids into a usable variable
-	var StreamingLinksFile = FileAccess.open(StreamingLinksLocation, FileAccess.READ)
-	if StreamingLinksFile != null:
-		var StreamingLinksJSON = JSON.new() 
-		if StreamingLinksJSON.parse(StreamingLinksFile.get_as_text()) == 0: 
-			StreamingLinks = StreamingLinksJSON.data 
-			
+func LoadJSONData() -> void:	#Loads the website links and flatpak ids into a usable variable
+	var VariablesFile = FileAccess.open(StaticVariablesLocation, FileAccess.READ)
+	if VariablesFile != null:
+		var VariablesJSON = JSON.new() 
+		if VariablesJSON.parse(VariablesFile.get_as_text()) == 0: 
+			AppVersion.text = VariablesJSON.data["Version"]
+			StreamingLinks = VariablesJSON.data["Web Links"]
+			GithubLink = VariablesJSON.data["Github Link"]
+			BrowserTable = VariablesJSON.data["Browser Flatpaks"]
+						
 func LoadBashScriptSettings() -> int:	#Loads the user and application defined settings into the 'Streaming.conf' file using the 'StreamingBlueprint.conf' file as a blueprint
 	var BlueprintFile = FileAccess.open(ConfBlueprintLocation, FileAccess.READ)
 	if BlueprintFile != null:
 		if SettingsMenu.BrowserOption.selected != -1:
-			var BrowserFlatpakLink = SettingsMenu.BrowserTable[str(SettingsMenu.BrowserOption.get_selected_id())]["Flatpak"]
+			var BrowserFlatpakLink = BrowserTable[str(SettingsMenu.BrowserOption.get_selected_id())]["Flatpak"]
 			if SettingsMenu.FlatpakIsInstalled(BrowserFlatpakLink) == 0:
 				var BlueprintText = BlueprintFile.get_as_text()
 				if BlueprintText:	#Load the resolution/browser settings
@@ -102,17 +105,6 @@ func LoadBashScriptSettings() -> int:	#Loads the user and application defined se
 	BlueprintFile.close()
 	return 1
 	
-func LoadVersion() -> void: #Loads the application version and sets it as the subtitle
-	var VersionFile = FileAccess.open(VersionFileLocation, FileAccess.READ)
-	if VersionFile != null:
-		var VersionJSON = JSON.new() 
-		if VersionJSON.parse(VersionFile.get_as_text()) == 0: 
-			AppVersion.text = VersionJSON.data["Version"]
-		else:
-			ShowErrorMessage("IO Error", "Unable to load data from '" + VersionFileLocation + "'")
-	else:
-		ShowErrorMessage("IO Error", "Unable to open '" + VersionFileLocation + "'")
-
 func ToggleMainButtonsDisabled(Toggle: bool) -> void: 	#Toggles the website links, settings, and power buttons
 	for StreamingButton in ServicesBox.get_children():
 		StreamingButton.disabled = Toggle
@@ -129,7 +121,7 @@ func FindAndKillAnyActiveSessions() -> void:	#Kills any active flatpak sessions 
 	for CurrentApp in RunningApplications:
 		var CurrentAppStats = CurrentApp.split("\t")
 		var CurrentApplicationType = CurrentAppStats.get(2)
-		if CurrentApplicationType == SettingsMenu.BrowserTable[str(SettingsMenu.BrowserOption.selected)]["Flatpak"]:		
+		if CurrentApplicationType == BrowserTable[str(SettingsMenu.BrowserOption.selected)]["Flatpak"]:		
 			OS.execute_with_pipe("flatpak", ["kill", CurrentAppStats[0]])		#If open browser session is matched with currently selected browser then close it
 		
 func UpdateClock() -> void:		#Setter function that updates the clock in the right of the application
@@ -145,10 +137,13 @@ func DownloadLatestRelease() -> void:	#Sets the download file/location and makes
 	
 func DownloadLatestReleaseCompleted(Result: int, ResponseCode: int, _Headers: PackedStringArray, _Body: PackedByteArray) -> void:
 	if Result == FetchLatestGithubReleaseRequest.RESULT_SUCCESS && ResponseCode == 200: 
+		var ApplicationDataAbsolute = ProjectSettings.globalize_path("user://")
 		OS.execute("unzip", ["-o", "-q", UpdateFile, "-d", ExecutableLocation])							#Use unzip package to unzip contents to the current directory
 		OS.execute("rm", [UpdateFile]) 																	#Delete the zip file
-		OS.execute("rm", ["-r", ExecutableLocation + "Modules/"])										#Delete the first time installation scripts
+		OS.execute("rm", ["-r", ExecutableLocation + "Modules/"])										#Delete the first time installation scripts and their data
 		OS.execute("rm", [ExecutableLocation + "/CreateSteamShortcut.py", ExecutableLocation + "/AutoInstall.sh"])
+		OS.execute("rm", ["-r", ApplicationDataAbsolute + "Streaming"])									#Delete the local user settings in case of update changes
+		OS.execute("rm", ["-r", ApplicationDataAbsolute + "shader_cache"])								#Delete the shader cache
 		MoveUserFilesIfApplicable()
 		ShowErrorMessage("Info", "Update complete. Please restart the application")		
 	else:
@@ -198,12 +193,12 @@ func LoadWebBrowserApplication(ServiceType: String) -> void: 	#Loads a web brows
 	if LoadBashScriptSettings() == 0:	#If script settings successfully loaded, launch the browser
 		FindAndKillAnyActiveSessions()
 		var LaunchScriptLocation = ProjectSettings.globalize_path(BuildType + "://" + ProjectSubFolder + "Streaming/LaunchBrowser.sh")
-		var BrowserInstance = OS.execute_with_pipe("bash", [LaunchScriptLocation, StreamingLinks["Web Links"][ServiceType]])
+		var BrowserInstance = OS.execute_with_pipe("bash", [LaunchScriptLocation, StreamingLinks[ServiceType]])
 		if BrowserInstance:
 			if MenuSettings["AutoClose"]:
 				_on_power_pressed()
 		else:
-			ShowErrorMessage("Program Error", "Unable to launch " + StreamingLinks["Web Links"][ServiceType])
+			ShowErrorMessage("Program Error", "Unable to launch " + StreamingLinks[ServiceType])
 					
 func ReturnButtonFromType(Type: String) -> Button:	#Returns a UI button given a simple descriptor
 	match Type:
@@ -237,10 +232,10 @@ func ReturnButtonFromType(Type: String) -> Button:	#Returns a UI button given a 
 #Trigger Functions
 func _ready() -> void:
 	LoadArguments()
-	LoadVersion()
-	LoadStreamingLinks()
+	LoadJSONData()
 	MoveUserFilesIfApplicable()
 	SettingsMenu.LoadSettings()
+	SettingsMenu.LoadAvailableBrowserData()
 	FetchLatestGithubReleaseRequest.request_completed.connect(FetchLatestReleaseCompleted) 
 	DownloadLatestGithubReleaseRequest.request_completed.connect(DownloadLatestReleaseCompleted)
 	get_viewport().focus_entered.connect(_on_window_focus_in)
@@ -261,18 +256,20 @@ func _on_button_focus_gained(ServiceType: String) -> void:
 	if ServiceButtonEntered != null && !ServiceButtonEntered.disabled:
 		if MenuSettings["MenuSounds"] && EnableUISoundsFocus:
 			MenuBlips.play()
-		PreviewImage.texture = BackgroundImages.get_resource(ServiceType) 
-		LogoAnimations.play("Preview Fade In")		
+		if ServiceType not in ["Power", "Update", "Settings"]:
+			ServiceButtonEntered.pivot_offset = ServiceButtonEntered.size / 2
+			ServiceButtonEntered.scale = Vector2(1.1, 1.1)
+			PreviewImage.texture = BackgroundImages.get_resource(ServiceType) 
+			LogoAnimations.play("Preview Fade In")		
 		
 func _on_button_focus_lost(ServiceType: String) -> void:
 	var ServiceButtonEntered = ReturnButtonFromType(ServiceType)
 	if ServiceButtonEntered != null && !ServiceButtonEntered.disabled:
-		LogoAnimations.play("Preview Fade Out")		
-		
-func _on_other_buttons_focus_gained() -> void:
-	if MenuSettings["MenuSounds"] && EnableUISoundsFocus:
-		MenuBlips.play()
-				
+		if ServiceType not in ["Power", "Update", "Settings"]:
+			ServiceButtonEntered.pivot_offset = ServiceButtonEntered.size / 2
+			ServiceButtonEntered.scale = Vector2(1, 1)
+			LogoAnimations.play("Preview Fade Out")		
+						
 func _on_mouse_entered_focus_toggle(ServiceType: String, Focus: bool) -> void:
 	var ServiceButtonEntered = ReturnButtonFromType(ServiceType)
 	if ServiceButtonEntered != null && !ServiceButtonEntered.disabled:

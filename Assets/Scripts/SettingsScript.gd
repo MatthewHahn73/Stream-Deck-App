@@ -9,24 +9,11 @@ extends Control
 @onready var SettingsMenu: Control = $"."
 @onready var DefaultScript: Control = get_parent().get_parent() 	#DefaultScene Node
 
-#Static Variables
-var BrowserTableLocation = "res://Assets/JSON/BrowserFlatpaks.json"
-
-#Instance Variables
-var BrowserTable = {}
-
 #Custom Functions
 func LoadAvailableBrowserData() -> void: #Searches the system for valid, installed browsers and adds them to the drop down
-	var BrowserTableFile = FileAccess.open(BrowserTableLocation, FileAccess.READ)
-	if BrowserTableFile != null:
-		var BrowserTableJSON = JSON.new() 
-		if BrowserTableJSON.parse(BrowserTableFile.get_as_text()) == 0: 
-			BrowserTable = BrowserTableJSON.data 
-			for Key in BrowserTable: 
-				if FlatpakIsInstalled(BrowserTable[Key]["Flatpak"]) == 0:
-					BrowserOption.add_item(BrowserTable[Key]["Name"], int(Key)) 
-	else:
-		DefaultScript.ShowErrorMessage("IOError", "Unable to get flatpak data from '" + BrowserTableLocation + "'")
+	for TableKey in DefaultScript.BrowserTable: 
+		if FlatpakIsInstalled(DefaultScript.BrowserTable[TableKey]["Flatpak"]) == 0:
+			BrowserOption.add_item(DefaultScript.BrowserTable[TableKey]["Name"], int(TableKey)) 
 	
 func LoadSettings() -> void: 	#Loads the user settings and sets those values
 	var SettingsDataLocal = LoadSettingsData()
@@ -103,19 +90,18 @@ func ReturnButtonFromType(Type: String) -> Button: #Returns a UI button given a 
 			return $SettingsContainer/MenuSoundsRow/CheckboxContainer/MenuSoundsButton
 		"AutoClose":
 			return $SettingsContainer/AutoCloseRow/CheckboxContainer/AutoCloseButton
+		"BrowserDropDown":
+			return $SettingsContainer/BrowserRow/BrowserOption
 		_:
 			return null
 	
 #Trigger Functions
-func _ready() -> void:
-	LoadAvailableBrowserData()
-
 func _on_button_focus_gained(ButtonType: String) -> void:
 	var ButtonEntered = ReturnButtonFromType(ButtonType)
 	if ButtonEntered != null && !ButtonEntered.disabled:
 		if DefaultScript.MenuSettings["MenuSounds"] && DefaultScript.EnableUISoundsFocus:
 			DefaultScript.MenuBlips.play()
-
+	
 func _on_mouse_entered_focus_toggle(ServiceType: String, Focus: bool) -> void:
 	var ServiceButtonEntered = ReturnButtonFromType(ServiceType)
 	if ServiceButtonEntered != null && !ServiceButtonEntered.disabled:
@@ -139,3 +125,7 @@ func _on_settings_save_button_pressed() -> void:
 func _on_back_button_pressed() -> void:
 	ToggleAllElementsFocusDisabled(false)
 	DefaultScript.SettingsAnimations.play("Settings Load Out")
+
+func _on_browser_option_toggled(_toggled_on: bool) -> void:
+	if DefaultScript.MenuSettings["MenuSounds"] && DefaultScript.EnableUISoundsFocus:
+		DefaultScript.MenuClicks.play()

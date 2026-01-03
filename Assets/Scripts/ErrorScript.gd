@@ -9,7 +9,7 @@ extends Control
 @onready var BackButton: Button = $ErrorBoxTexture/Acknowledgement/BackButton
 
 #Custom Functions
-func UpdateErrorMessage(ErrorType: String, ErrorMessage: String) -> void:	#Setter function for the error message type and content
+func UpdateErrorMessage(ErrorType: String, ErrorMessage: String) -> void:
 	ErrorTypeLabel.text = ErrorType
 	ErrorMessageLabel.text = ErrorMessage
 	

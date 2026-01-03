@@ -131,9 +131,12 @@ theme = ExtResource("3_m1o7v")
 text = "Save"
 
 [connection signal="item_selected" from="SettingsContainer/BrowserRow/BrowserOption" to="." method="_on_resolution_option_item_selected"]
+[connection signal="toggled" from="SettingsContainer/BrowserRow/BrowserOption" to="." method="_on_browser_option_toggled"]
+[connection signal="focus_entered" from="SettingsContainer/MenuSoundsRow/CheckboxContainer/MenuSoundsButton" to="." method="_on_button_focus_gained" binds= ["MenuSounds"]]
 [connection signal="mouse_entered" from="SettingsContainer/MenuSoundsRow/CheckboxContainer/MenuSoundsButton" to="." method="_on_mouse_entered_focus_toggle" binds= ["MenuSounds", true]]
 [connection signal="mouse_exited" from="SettingsContainer/MenuSoundsRow/CheckboxContainer/MenuSoundsButton" to="." method="_on_mouse_entered_focus_toggle" binds= ["MenuSounds", false]]
 [connection signal="pressed" from="SettingsContainer/MenuSoundsRow/CheckboxContainer/MenuSoundsButton" to="." method="_on_resolution_option_item_selected" binds= [0]]
+[connection signal="focus_entered" from="SettingsContainer/AutoCloseRow/CheckboxContainer/AutoCloseButton" to="." method="_on_button_focus_gained" binds= ["AutoClose"]]
 [connection signal="mouse_entered" from="SettingsContainer/AutoCloseRow/CheckboxContainer/AutoCloseButton" to="." method="_on_mouse_entered_focus_toggle" binds= ["AutoClose", true]]
 [connection signal="mouse_exited" from="SettingsContainer/AutoCloseRow/CheckboxContainer/AutoCloseButton" to="." method="_on_mouse_entered_focus_toggle" binds= ["AutoClose", false]]
 [connection signal="pressed" from="SettingsContainer/AutoCloseRow/CheckboxContainer/AutoCloseButton" to="." method="_on_resolution_option_item_selected" binds= [0]]
